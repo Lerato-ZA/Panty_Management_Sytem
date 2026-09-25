@@ -41,8 +41,5 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
 
 
-    // Room Database Dependencies (Java)
-    val roomVersion = "2.8.5"
-    implementation(libs.room.runtime)
-    annotationProcessor(libs.room.compiler)
-} r
+
+}
