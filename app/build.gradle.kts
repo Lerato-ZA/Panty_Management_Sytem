@@ -45,4 +45,4 @@ dependencies {
     val roomVersion = "2.8.5"
     implementation(libs.room.runtime)
     annotationProcessor(libs.room.compiler)
-}
+} r
