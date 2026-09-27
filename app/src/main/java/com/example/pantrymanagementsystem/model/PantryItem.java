@@ -1,12 +1,16 @@
 package com.example.pantrymanagementsystem.model;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 /**
- * Plain data holder for one pantry item.
- * Supports separate quantity (number available) and size (e.g. 2 kg, 500 g).
+ * Plain data holder for one pantry item used by UI layers.
+ * Maps cleanly to/from database entities (data.entity.PantryItem).
  */
 public class PantryItem {
 
-    private long id;           // DB primary key in Tier 3
+    private long id;
     private String name;
     private int quantity;      // Number of items available (count)
     private String size;       // Size of the object (e.g., "2 kg", "500 g", "1 pcs")
@@ -42,4 +46,43 @@ public class PantryItem {
 
     public String getExpiryDate() { return expiryDate; }
     public void setExpiryDate(String expiryDate) { this.expiryDate = expiryDate; }
+
+    // ---- Entity Conversion Helpers ----
+    public com.example.pantrymanagementsystem.data.entity.PantryItem toEntity() {
+        Long expiryMillis = null;
+        if (expiryDate != null && !expiryDate.trim().isEmpty()) {
+            try {
+                Date d = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).parse(expiryDate.trim());
+                if (d != null) expiryMillis = d.getTime();
+            } catch (Exception ignored) {
+            }
+        }
+        com.example.pantrymanagementsystem.data.entity.PantryItem entity =
+                new com.example.pantrymanagementsystem.data.entity.PantryItem(
+                        name,
+                        quantity,
+                        size != null && !size.trim().isEmpty() ? size : "pcs",
+                        category != null ? category : "Other",
+                        expiryMillis,
+                        System.currentTimeMillis()
+                );
+        entity.setId(id);
+        return entity;
+    }
+
+    public static PantryItem fromEntity(com.example.pantrymanagementsystem.data.entity.PantryItem entity) {
+        if (entity == null) return null;
+        String expiryStr = null;
+        if (entity.getExpiryDate() != null) {
+            expiryStr = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date(entity.getExpiryDate()));
+        }
+        return new PantryItem(
+                entity.getId(),
+                entity.getName(),
+                (int) entity.getQuantity(),
+                entity.getUnit(),
+                entity.getCategory(),
+                expiryStr
+        );
+    }
 }

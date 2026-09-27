@@ -11,9 +11,12 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.pantrymanagementsystem.data.dao.PantryItemDao;
+import com.example.pantrymanagementsystem.model.PantryItem;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.Calendar;
+import java.util.Locale;
 
 public class AddEditItemActivity extends AppCompatActivity {
 
@@ -22,17 +25,20 @@ public class AddEditItemActivity extends AppCompatActivity {
     private TextView tvFormTitle;
     private Button btnSaveItem;
 
+    private PantryItemDao pantryItemDao;
+    private boolean isEditMode = false;
+    private long editingItemId = -1;
+
     private final String[] categories = {
             "Grains", "Vegetables", "Fruits", "Meat", "Dairy", "Canned Goods", "Spices", "Other"
     };
-
-    private boolean isEditMode = false;
-    private long editingItemId = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_edit_item);
+
+        pantryItemDao = new PantryItemDao(this);
 
         tvFormTitle = findViewById(R.id.tvFormTitle);
         etItemName = findViewById(R.id.etItemName);
@@ -48,7 +54,7 @@ public class AddEditItemActivity extends AppCompatActivity {
 
         etExpiryDate.setOnClickListener(v -> showDatePicker());
 
-        // Check if editing an existing item
+        // Check if editing an existing item from DB
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra("item_id")) {
             isEditMode = true;
@@ -56,21 +62,22 @@ public class AddEditItemActivity extends AppCompatActivity {
             tvFormTitle.setText("Edit Pantry Item");
             btnSaveItem.setText("Update Item");
 
-            String itemName = intent.getStringExtra("item_name");
-            etItemName.setText(itemName != null ? itemName : "");
-            int qty = intent.getIntExtra("item_quantity", 1);
-            etQuantity.setText(String.valueOf(qty));
-            String itemSize = intent.getStringExtra("item_size");
-            etSize.setText(itemSize != null ? itemSize : "");
-            String itemExpiry = intent.getStringExtra("item_expiry");
-            etExpiryDate.setText(itemExpiry != null ? itemExpiry : "");
+            com.example.pantrymanagementsystem.data.entity.PantryItem entity = pantryItemDao.getById(editingItemId);
+            if (entity != null) {
+                PantryItem item = PantryItem.fromEntity(entity);
+                etItemName.setText(item.getName());
+                etQuantity.setText(String.valueOf(item.getQuantity()));
+                etSize.setText(item.getSize());
+                if (item.getExpiryDate() != null) {
+                    etExpiryDate.setText(item.getExpiryDate());
+                }
 
-            String category = intent.getStringExtra("item_category");
-            if (category != null) {
-                for (int i = 0; i < categories.length; i++) {
-                    if (categories[i].equals(category)) {
-                        spinnerCategory.setSelection(i);
-                        break;
+                if (item.getCategory() != null) {
+                    for (int i = 0; i < categories.length; i++) {
+                        if (categories[i].equalsIgnoreCase(item.getCategory())) {
+                            spinnerCategory.setSelection(i);
+                            break;
+                        }
                     }
                 }
             }
@@ -82,7 +89,7 @@ public class AddEditItemActivity extends AppCompatActivity {
     private void showDatePicker() {
         Calendar calendar = Calendar.getInstance();
         DatePickerDialog dialog = new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
-            String formatted = String.format("%04d-%02d-%02d", year, month + 1, dayOfMonth);
+            String formatted = String.format(Locale.getDefault(), "%04d-%02d-%02d", year, month + 1, dayOfMonth);
             etExpiryDate.setText(formatted);
         }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
         dialog.show();
@@ -94,7 +101,6 @@ public class AddEditItemActivity extends AppCompatActivity {
         String size = etSize.getText() != null ? etSize.getText().toString().trim() : "";
         String category = spinnerCategory.getSelectedItem() != null ? spinnerCategory.getSelectedItem().toString() : "Other";
         String expiry = etExpiryDate.getText() != null ? etExpiryDate.getText().toString().trim() : "";
-        if (expiry.isEmpty()) expiry = null;
 
         if (name.isEmpty()) {
             etItemName.setError("Item name is required");
@@ -113,17 +119,17 @@ public class AddEditItemActivity extends AppCompatActivity {
             return;
         }
 
-        Intent resultIntent = new Intent();
-        resultIntent.putExtra("item_id", editingItemId);
-        resultIntent.putExtra("item_name", name);
-        resultIntent.putExtra("item_quantity", quantity);
-        resultIntent.putExtra("item_size", size.isEmpty() ? "1 pcs" : size);
-        resultIntent.putExtra("item_category", category);
-        resultIntent.putExtra("item_expiry", expiry);
-        resultIntent.putExtra("is_edit", isEditMode);
+        PantryItem uiItem = new PantryItem(editingItemId, name, quantity, size.isEmpty() ? "1 pcs" : size, category, expiry.isEmpty() ? null : expiry);
 
-        setResult(RESULT_OK, resultIntent);
-        Toast.makeText(this, isEditMode ? "Updated " + name : "Added " + name, Toast.LENGTH_SHORT).show();
+        if (isEditMode) {
+            pantryItemDao.update(uiItem.toEntity());
+            Toast.makeText(this, name + " updated", Toast.LENGTH_SHORT).show();
+        } else {
+            pantryItemDao.insert(uiItem.toEntity());
+            Toast.makeText(this, name + " saved to database", Toast.LENGTH_SHORT).show();
+        }
+
+        setResult(RESULT_OK);
         finish();
     }
 }

@@ -1,6 +1,6 @@
 package com.example.pantrymanagementsystem.data.entity;
 
-public class PantryItem {
+public class  PantryItem {
 
     private long id;
     private String name;
