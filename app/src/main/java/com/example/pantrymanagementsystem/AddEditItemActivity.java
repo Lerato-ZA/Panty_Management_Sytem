@@ -11,8 +11,8 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.pantrymanagementsystem.data.dao.PantryItemDao;
 import com.example.pantrymanagementsystem.model.PantryItem;
+import com.example.pantrymanagementsystem.repository.PantryRepository;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.Calendar;
@@ -25,10 +25,11 @@ public class AddEditItemActivity extends AppCompatActivity {
     private TextView tvFormTitle;
     private Button btnSaveItem;
 
-    private PantryItemDao pantryItemDao;
+    private PantryRepository repository;
     private boolean isEditMode = false;
     private long editingItemId = -1;
 
+    // Categories
     private final String[] categories = {
             "Grains", "Vegetables", "Fruits", "Meat", "Dairy", "Canned Goods", "Spices", "Other"
     };
@@ -38,7 +39,7 @@ public class AddEditItemActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_edit_item);
 
-        pantryItemDao = new PantryItemDao(this);
+        repository = PantryRepository.getInstance(this);
 
         tvFormTitle = findViewById(R.id.tvFormTitle);
         etItemName = findViewById(R.id.etItemName);
@@ -54,7 +55,6 @@ public class AddEditItemActivity extends AppCompatActivity {
 
         etExpiryDate.setOnClickListener(v -> showDatePicker());
 
-        // Check if editing an existing item from DB
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra("item_id")) {
             isEditMode = true;
@@ -62,25 +62,26 @@ public class AddEditItemActivity extends AppCompatActivity {
             tvFormTitle.setText("Edit Pantry Item");
             btnSaveItem.setText("Update Item");
 
-            com.example.pantrymanagementsystem.data.entity.PantryItem entity = pantryItemDao.getById(editingItemId);
-            if (entity != null) {
-                PantryItem item = PantryItem.fromEntity(entity);
-                etItemName.setText(item.getName());
-                etQuantity.setText(String.valueOf(item.getQuantity()));
-                etSize.setText(item.getSize());
-                if (item.getExpiryDate() != null) {
-                    etExpiryDate.setText(item.getExpiryDate());
-                }
+            repository.getPantryItemById(editingItemId, entity -> {
+                if (entity != null) {
+                    PantryItem item = PantryItem.fromEntity(entity);
+                    etItemName.setText(item.getName());
+                    etQuantity.setText(String.valueOf(item.getQuantity()));
+                    etSize.setText(item.getSize());
+                    if (item.getExpiryDate() != null) {
+                        etExpiryDate.setText(item.getExpiryDate());
+                    }
 
-                if (item.getCategory() != null) {
-                    for (int i = 0; i < categories.length; i++) {
-                        if (categories[i].equalsIgnoreCase(item.getCategory())) {
-                            spinnerCategory.setSelection(i);
-                            break;
+                    if (item.getCategory() != null) {
+                        for (int i = 0; i < categories.length; i++) {
+                            if (categories[i].equalsIgnoreCase(item.getCategory())) {
+                                spinnerCategory.setSelection(i);
+                                break;
+                            }
                         }
                     }
                 }
-            }
+            });
         }
 
         btnSaveItem.setOnClickListener(v -> attemptSave());
@@ -122,14 +123,17 @@ public class AddEditItemActivity extends AppCompatActivity {
         PantryItem uiItem = new PantryItem(editingItemId, name, quantity, size.isEmpty() ? "1 pcs" : size, category, expiry.isEmpty() ? null : expiry);
 
         if (isEditMode) {
-            pantryItemDao.update(uiItem.toEntity());
-            Toast.makeText(this, name + " updated", Toast.LENGTH_SHORT).show();
+            repository.updatePantryItem(uiItem.toEntity(), success -> {
+                Toast.makeText(this, name + " updated", Toast.LENGTH_SHORT).show();
+                setResult(RESULT_OK);
+                finish();
+            });
         } else {
-            pantryItemDao.insert(uiItem.toEntity());
-            Toast.makeText(this, name + " saved to database", Toast.LENGTH_SHORT).show();
+            repository.insertPantryItem(uiItem.toEntity(), newId -> {
+                Toast.makeText(this, name + " saved to database", Toast.LENGTH_SHORT).show();
+                setResult(RESULT_OK);
+                finish();
+            });
         }
-
-        setResult(RESULT_OK);
-        finish();
     }
 }

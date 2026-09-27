@@ -1,7 +1,6 @@
 package com.example.pantrymanagementsystem;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -14,8 +13,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.pantrymanagementsystem.adapter.PantryAdapter;
-import com.example.pantrymanagementsystem.data.dao.PantryItemDao;
 import com.example.pantrymanagementsystem.model.PantryItem;
+import com.example.pantrymanagementsystem.repository.PantryRepository;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -26,7 +25,7 @@ public class MainActivity extends AppCompatActivity implements PantryAdapter.OnI
     private RecyclerView rvPantryItems;
     private TextView tvEmptyState;
     private PantryAdapter adapter;
-    private PantryItemDao pantryItemDao;
+    private PantryRepository repository;
 
     private List<PantryItem> pantryItems = new ArrayList<>();
     private ActivityResultLauncher<Intent> addEditItemLauncher;
@@ -36,7 +35,7 @@ public class MainActivity extends AppCompatActivity implements PantryAdapter.OnI
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        pantryItemDao = new PantryItemDao(this);
+        repository = PantryRepository.getInstance(this);
 
         rvPantryItems = findViewById(R.id.rvPantryItems);
         tvEmptyState = findViewById(R.id.tvEmptyState);
@@ -75,14 +74,16 @@ public class MainActivity extends AppCompatActivity implements PantryAdapter.OnI
     }
 
     private void loadPantryItemsFromDb() {
-        List<com.example.pantrymanagementsystem.data.entity.PantryItem> entities = pantryItemDao.getAll();
-        pantryItems.clear();
-
-        for (com.example.pantrymanagementsystem.data.entity.PantryItem entity : entities) {
-            pantryItems.add(PantryItem.fromEntity(entity));
-        }
-        adapter.updateItems(pantryItems);
-        refreshEmptyState();
+        repository.getAllPantryItems(entities -> {
+            pantryItems.clear();
+            if (entities != null) {
+                for (com.example.pantrymanagementsystem.data.entity.PantryItem entity : entities) {
+                    pantryItems.add(PantryItem.fromEntity(entity));
+                }
+            }
+            adapter.updateItems(pantryItems);
+            refreshEmptyState();
+        });
     }
 
     @Override
@@ -94,9 +95,10 @@ public class MainActivity extends AppCompatActivity implements PantryAdapter.OnI
 
     @Override
     public void onDeleteClicked(PantryItem item) {
-        pantryItemDao.delete(item.getId());
-        loadPantryItemsFromDb();
-        Toast.makeText(this, item.getName() + " removed from database", Toast.LENGTH_SHORT).show();
+        repository.deletePantryItem(item.getId(), success -> {
+            loadPantryItemsFromDb();
+            Toast.makeText(this, item.getName() + " removed", Toast.LENGTH_SHORT).show();
+        });
     }
 
     private void refreshEmptyState() {
