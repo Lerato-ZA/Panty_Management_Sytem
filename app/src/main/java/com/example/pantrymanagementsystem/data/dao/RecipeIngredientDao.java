@@ -12,6 +12,7 @@ import com.example.pantrymanagementsystem.data.entity.RecipeIngredient;
 import java.util.ArrayList;
 import java.util.List;
 
+// Database access object for recipe ingredients
 public class RecipeIngredientDao {
 
     private final DatabaseHelper dbHelper;
@@ -25,7 +26,7 @@ public class RecipeIngredientDao {
         return db.insert(RecipeIngredientEntry.TABLE_NAME, null, toContentValues(ingredient));
     }
 
-    /** Inserts a batch inside a single transaction (e.g. all ingredients for one new recipe). */
+    // Save a batch of ingredients together in one single transaction
     public void insertAll(List<RecipeIngredient> ingredients) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.beginTransaction();
@@ -76,6 +77,13 @@ public class RecipeIngredientDao {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         String selection = RecipeIngredientEntry._ID + " = ?";
         String[] args = { String.valueOf(id) };
+        return db.delete(RecipeIngredientEntry.TABLE_NAME, selection, args);
+    }
+
+    public int deleteForRecipe(long recipeId) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        String selection = RecipeIngredientEntry.COLUMN_RECIPE_ID + " = ?";
+        String[] args = { String.valueOf(recipeId) };
         return db.delete(RecipeIngredientEntry.TABLE_NAME, selection, args);
     }
 

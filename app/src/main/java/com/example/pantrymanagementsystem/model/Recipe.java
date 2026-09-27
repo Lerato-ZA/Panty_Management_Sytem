@@ -5,7 +5,7 @@ import com.example.pantrymanagementsystem.data.entity.RecipeIngredient;
 import java.util.ArrayList;
 import java.util.List;
 
-// Recipe model
+// UI model for a recipe
 public class Recipe {
 
     private long id;
@@ -46,7 +46,7 @@ public class Recipe {
         this.ingredients = ingredients != null ? ingredients : new ArrayList<>();
     }
 
-    // Conversion to and from database entities
+    // Converts UI recipe model to database entity
     public com.example.pantrymanagementsystem.data.entity.Recipe toEntity() {
         com.example.pantrymanagementsystem.data.entity.Recipe entity =
                 new com.example.pantrymanagementsystem.data.entity.Recipe(name, instructions, cookTimeMinutes, servings);
@@ -54,6 +54,7 @@ public class Recipe {
         return entity;
     }
 
+    // Creates UI recipe model from database entity
     public static Recipe fromEntity(com.example.pantrymanagementsystem.data.entity.Recipe entity) {
         if (entity == null) return null;
         return new Recipe(entity.getId(), entity.getName(), entity.getInstructions(), entity.getCookTimeMinutes(), entity.getServings());

@@ -4,7 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-// Item Class
+// UI model for a pantry item
 public class PantryItem {
 
     private long id;
@@ -44,7 +44,7 @@ public class PantryItem {
     public String getExpiryDate() { return expiryDate; }
     public void setExpiryDate(String expiryDate) { this.expiryDate = expiryDate; }
 
-    // ---- Entity Conversion Helpers ----
+    // Converts UI model to database entity
     public com.example.pantrymanagementsystem.data.entity.PantryItem toEntity() {
         Long expiryMillis = null;
         if (expiryDate != null && !expiryDate.trim().isEmpty()) {
@@ -67,6 +67,7 @@ public class PantryItem {
         return entity;
     }
 
+    // Creates UI model from database entity
     public static PantryItem fromEntity(com.example.pantrymanagementsystem.data.entity.PantryItem entity) {
         if (entity == null) return null;
         String expiryStr = null;

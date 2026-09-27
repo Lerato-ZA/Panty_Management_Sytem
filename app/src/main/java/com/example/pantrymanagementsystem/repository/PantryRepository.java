@@ -11,14 +11,22 @@ import com.example.pantrymanagementsystem.data.entity.PantryItem;
 import com.example.pantrymanagementsystem.data.entity.Recipe;
 import com.example.pantrymanagementsystem.data.entity.RecipeIngredient;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+// Repository class that connects the UI screens to the background database operations
 public class PantryRepository {
 
     public interface Callback<T> {
         void onComplete(T result);
+    }
+
+    public interface SuggestionCallback {
+        void onComplete(List<Recipe> recipes, Map<Long, List<RecipeIngredient>> ingredientsMap);
     }
 
     private final PantryItemDao pantryItemDao;
@@ -47,7 +55,7 @@ public class PantryRepository {
         this.recipeIngredientDao = new RecipeIngredientDao(context);
     }
 
-    //  Pantry Item Operations
+    // Pantry Item Operations
 
     public void getAllPantryItems(Callback<List<PantryItem>> callback) {
         executor.execute(() -> {
@@ -127,9 +135,16 @@ public class PantryRepository {
         });
     }
 
-    public void updateRecipe(Recipe recipe, Callback<Boolean> callback) {
+    public void updateRecipe(Recipe recipe, List<RecipeIngredient> ingredients, Callback<Boolean> callback) {
         executor.execute(() -> {
             int rows = recipeDao.update(recipe);
+            recipeIngredientDao.deleteForRecipe(recipe.getId());
+            if (ingredients != null) {
+                for (RecipeIngredient ing : ingredients) {
+                    ing.setRecipeId(recipe.getId());
+                }
+                recipeIngredientDao.insertAll(ingredients);
+            }
             mainHandler.post(() -> callback.onComplete(rows > 0));
         });
     }
@@ -139,5 +154,76 @@ public class PantryRepository {
             int rows = recipeDao.delete(recipeId);
             mainHandler.post(() -> callback.onComplete(rows > 0));
         });
+    }
+
+    // Strict Recipe Matching and Meal Suggestions
+
+    public void getSuggestedRecipes(SuggestionCallback callback) {
+        executor.execute(() -> {
+            List<PantryItem> pantry = pantryItemDao.getAll();
+            List<Recipe> allRecipes = recipeDao.getAll();
+            List<Recipe> suggestedRecipes = new ArrayList<>();
+            Map<Long, List<RecipeIngredient>> resultMap = new HashMap<>();
+
+            for (Recipe recipe : allRecipes) {
+                List<RecipeIngredient> ingredients = recipeIngredientDao.getForRecipe(recipe.getId());
+                if (ingredients.isEmpty()) {
+                    continue;
+                }
+
+                boolean canMake = true;
+
+                for (RecipeIngredient req : ingredients) {
+                    boolean ingredientMatch = false;
+
+                    for (PantryItem item : pantry) {
+                        if (item.getQuantity() > 0 && isIngredientMatch(item.getName(), req.getIngredientName())) {
+                            ingredientMatch = true;
+                            break;
+                        }
+                    }
+
+                    if (!ingredientMatch) {
+                        canMake = false;
+                        break;
+                    }
+                }
+
+                if (canMake) {
+                    suggestedRecipes.add(recipe);
+                    resultMap.put(recipe.getId(), ingredients);
+                }
+            }
+
+            mainHandler.post(() -> callback.onComplete(suggestedRecipes, resultMap));
+        });
+    }
+
+    private boolean isIngredientMatch(String pantryItemName, String requiredName) {
+        if (pantryItemName == null || requiredName == null) return false;
+
+        // Clean punctuation and normalize
+        String p = pantryItemName.replaceAll("[^a-zA-Z0-9\\s]", " ").replaceAll("\\s+", " ").trim().toLowerCase();
+        String r = requiredName.replaceAll("[^a-zA-Z0-9\\s]", " ").replaceAll("\\s+", " ").trim().toLowerCase();
+
+        if (p.isEmpty() || r.isEmpty()) return false;
+
+        if (p.equals(r) || p.contains(r) || r.contains(p)) {
+            return true;
+        }
+
+        String[] pWords = p.split(" ");
+        String[] rWords = r.split(" ");
+
+        for (String rWord : rWords) {
+            if (rWord.length() <= 2) continue; // skip short words like "of", "in"
+            for (String pWord : pWords) {
+                if (pWord.equals(rWord) || pWord.contains(rWord) || rWord.contains(pWord)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

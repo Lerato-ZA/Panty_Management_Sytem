@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements PantryAdapter.OnI
         tvEmptyState = findViewById(R.id.tvEmptyState);
         FloatingActionButton fabAddItem = findViewById(R.id.fabAddItem);
         View btnSuggestMeal = findViewById(R.id.btnSuggestMeal);
-        View btnAddRecipe = findViewById(R.id.btnAddRecipe);
+        View btnRecipes = findViewById(R.id.btnRecipes);
 
         adapter = new PantryAdapter(pantryItems, this);
         rvPantryItems.setLayoutManager(new LinearLayoutManager(this));
@@ -63,16 +63,17 @@ public class MainActivity extends AppCompatActivity implements PantryAdapter.OnI
             addEditItemLauncher.launch(intent);
         });
 
-        if (btnAddRecipe != null) {
-            btnAddRecipe.setOnClickListener(v -> {
-                Intent intent = new Intent(MainActivity.this, AddRecipeActivity.class);
+        if (btnRecipes != null) {
+            btnRecipes.setOnClickListener(v -> {
+                Intent intent = new Intent(MainActivity.this, RecipeListActivity.class);
                 startActivity(intent);
             });
         }
 
-        btnSuggestMeal.setOnClickListener(v ->
-            Toast.makeText(this, "Meal suggestion logic comes in Tier 2", Toast.LENGTH_SHORT).show()
-        );
+        btnSuggestMeal.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, MealSuggestionsActivity.class);
+            startActivity(intent);
+        });
     }
 
     @Override
