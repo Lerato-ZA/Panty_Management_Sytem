@@ -10,7 +10,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- Top bar with title + "Suggest Meal" action -->
+        <!-- Top bar with title + "Add Recipe" + "Suggest Meal" action -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -28,9 +28,16 @@
                 android:textStyle="bold" />
 
             <Button
+                android:id="@+id/btnAddRecipe"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="+ Recipe" />
+
+            <Button
                 android:id="@+id/btnSuggestMeal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
                 android:text="Suggest Meal" />
         </LinearLayout>
 

@@ -7,7 +7,7 @@ public class  PantryItem {
     private double quantity;
     private String unit;          // "g", "ml", "pcs", etc.
     private String category;      // "Grain", "Dairy", "Produce", etc.
-    private Long expiryDate;      // epoch millis, null if item doesn't expire
+    private Long expiryDate;      // null if never expires
     private long dateAdded;
 
     public PantryItem(String name, double quantity, String unit,

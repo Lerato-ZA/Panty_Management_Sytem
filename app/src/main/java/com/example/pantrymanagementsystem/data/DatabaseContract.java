@@ -12,8 +12,8 @@ public final class DatabaseContract {
         public static final String COLUMN_QUANTITY = "quantity";
         public static final String COLUMN_UNIT = "unit";
         public static final String COLUMN_CATEGORY = "category";
-        public static final String COLUMN_EXPIRY_DATE = "expiry_date";   // nullable, epoch millis
-        public static final String COLUMN_DATE_ADDED = "date_added";     // epoch millis
+        public static final String COLUMN_EXPIRY_DATE = "expiry_date";
+        public static final String COLUMN_DATE_ADDED = "date_added";
     }
 
     public static class RecipeEntry implements BaseColumns {

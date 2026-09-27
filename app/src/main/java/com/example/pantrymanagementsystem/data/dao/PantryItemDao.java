@@ -12,11 +12,7 @@ import com.example.pantrymanagementsystem.data.entity.PantryItem;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * All raw SQLite access for PantryItem. Every method here does blocking
- * disk I/O and must be called off the main thread — the Logic tier's
- * Repository is responsible for dispatching to a background thread.
- */
+// SQLite Operations
 public class PantryItemDao {
 
     private final DatabaseHelper dbHelper;
@@ -25,13 +21,13 @@ public class PantryItemDao {
         this.dbHelper = DatabaseHelper.getInstance(context);
     }
 
-    // ---- Create ----
+    // Create
     public long insert(PantryItem item) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         return db.insert(PantryItemEntry.TABLE_NAME, null, toContentValues(item));
     }
 
-    // ---- Read ----
+    // Read
     public PantryItem getById(long id) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String selection = PantryItemEntry._ID + " = ?";
@@ -86,7 +82,7 @@ public class PantryItemDao {
         return items;
     }
 
-    // ---- Update ----
+    //  Update
     public int update(PantryItem item) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         String selection = PantryItemEntry._ID + " = ?";
@@ -94,7 +90,7 @@ public class PantryItemDao {
         return db.update(PantryItemEntry.TABLE_NAME, toContentValues(item), selection, args);
     }
 
-    // ---- Delete ----
+    //  Delete
     public int delete(long id) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         String selection = PantryItemEntry._ID + " = ?";
@@ -102,7 +98,7 @@ public class PantryItemDao {
         return db.delete(PantryItemEntry.TABLE_NAME, selection, args);
     }
 
-    // ---- mapping helpers ----
+    //  Mapping helpers
     private ContentValues toContentValues(PantryItem item) {
         ContentValues values = new ContentValues();
         values.put(PantryItemEntry.COLUMN_NAME, item.getName());

@@ -4,18 +4,15 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-/**
- * Plain data holder for one pantry item used by UI layers.
- * Maps cleanly to/from database entities (data.entity.PantryItem).
- */
+// Item Class
 public class PantryItem {
 
     private long id;
     private String name;
-    private int quantity;      // Number of items available (count)
-    private String size;       // Size of the object (e.g., "2 kg", "500 g", "1 pcs")
+    private int quantity;
+    private String size;
     private String category;
-    private String expiryDate; // stored as "yyyy-MM-dd" or null if not set
+    private String expiryDate;
 
     public PantryItem() {
     }

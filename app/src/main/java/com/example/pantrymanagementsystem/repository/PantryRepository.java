@@ -15,11 +15,6 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/**
- * LOGIC LAYER (Repository):
- * Acts as the mediator between the Presentation (GUI) layer and the Persistence (Database DAOs) layer.
- * All database I/O operations execute on a background thread, returning results on the main UI thread.
- */
 public class PantryRepository {
 
     public interface Callback<T> {
@@ -52,7 +47,7 @@ public class PantryRepository {
         this.recipeIngredientDao = new RecipeIngredientDao(context);
     }
 
-    // ---- Pantry Item Operations ----
+    //  Pantry Item Operations
 
     public void getAllPantryItems(Callback<List<PantryItem>> callback) {
         executor.execute(() -> {
@@ -96,12 +91,26 @@ public class PantryRepository {
         });
     }
 
-    // ---- Recipe Operations ----
+    // Recipe Operations
 
     public void getAllRecipes(Callback<List<Recipe>> callback) {
         executor.execute(() -> {
             List<Recipe> recipes = recipeDao.getAll();
             mainHandler.post(() -> callback.onComplete(recipes));
+        });
+    }
+
+    public void getRecipeById(long recipeId, Callback<Recipe> callback) {
+        executor.execute(() -> {
+            Recipe recipe = recipeDao.getById(recipeId);
+            mainHandler.post(() -> callback.onComplete(recipe));
+        });
+    }
+
+    public void getIngredientsForRecipe(long recipeId, Callback<List<RecipeIngredient>> callback) {
+        executor.execute(() -> {
+            List<RecipeIngredient> ingredients = recipeIngredientDao.getForRecipe(recipeId);
+            mainHandler.post(() -> callback.onComplete(ingredients));
         });
     }
 
@@ -115,6 +124,20 @@ public class PantryRepository {
                 recipeIngredientDao.insertAll(ingredients);
             }
             mainHandler.post(() -> callback.onComplete(recipeId));
+        });
+    }
+
+    public void updateRecipe(Recipe recipe, Callback<Boolean> callback) {
+        executor.execute(() -> {
+            int rows = recipeDao.update(recipe);
+            mainHandler.post(() -> callback.onComplete(rows > 0));
+        });
+    }
+
+    public void deleteRecipe(long recipeId, Callback<Boolean> callback) {
+        executor.execute(() -> {
+            int rows = recipeDao.delete(recipeId);
+            mainHandler.post(() -> callback.onComplete(rows > 0));
         });
     }
 }
