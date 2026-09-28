@@ -1,41 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mealSuggestionsRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:background="@color/bg_page"
+    android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/tvHeaderTitle"
+    <!-- Top Header Bar with insets -->
+    <LinearLayout
+        android:id="@+id/layoutSuggestionsHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Meal Suggestions"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="4dp" />
+        android:background="@drawable/bg_header_sub"
+        android:paddingHorizontal="16dp"
+        android:paddingBottom="14dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
 
-    <TextView
-        android:id="@+id/tvHeaderSubtitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Recipes you can make right now based on your pantry items:"
-        android:textSize="14sp"
-        android:textColor="#666666"
-        android:layout_marginBottom="16dp" />
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Back"
+            android:src="@drawable/ic_arrow_back"
+            app:tint="#FFFFFF" />
 
-    <TextView
-        android:id="@+id/tvEmptySuggestions"
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="10dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvHeaderTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Meal Suggestions"
+                android:textColor="@color/text_on_dark"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvHeaderSubtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Recipes you can make right now based on your pantry items:"
+                android:textColor="@color/text_on_dark_secondary"
+                android:textSize="12sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Empty Suggestions State -->
+    <LinearLayout
+        android:id="@+id/layoutEmptySuggestions"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="48dp"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:gravity="center"
-        android:text="No recipes match your current pantry items.\n\nAdd more ingredients or create a recipe to unlock meal suggestions!"
-        android:textSize="16sp"
-        android:visibility="gone" />
+        android:padding="24dp"
+        android:orientation="vertical"
+        android:visibility="gone">
 
+        <ImageView
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:src="@drawable/ic_empty_recipe"
+            android:contentDescription="Empty Suggestions" />
+
+        <TextView
+            android:id="@+id/tvEmptySuggestions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center"
+            android:text="No recipes match your current pantry items.\n\nAdd more ingredients or create a recipe to unlock meal suggestions!"
+            android:textColor="@color/text_secondary"
+            android:textSize="15sp" />
+    </LinearLayout>
+
+    <!-- Suggested Recipes List -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvSuggestedRecipes"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingTop="8dp"
+        android:paddingBottom="16dp"
+        android:clipToPadding="false" />
 
 </LinearLayout>

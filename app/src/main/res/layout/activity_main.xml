@@ -2,64 +2,217 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mainRoot"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/bg_page">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- Top bar with title + "Recipes" + "Suggest Meal" action -->
+        <!-- Top Header Card with curved bottom -->
         <LinearLayout
+            android:id="@+id/layoutHeader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="16dp"
-            android:gravity="center_vertical">
+            android:background="@drawable/bg_header_curved"
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingBottom="16dp">
 
+            <!-- Row 1: Screen Title -->
             <TextView
                 android:id="@+id/tvTitle"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:text="My Pantry"
+                android:textColor="@color/text_on_dark"
                 android:textSize="22sp"
                 android:textStyle="bold" />
 
-            <Button
-                android:id="@+id/btnRecipes"
-                android:layout_width="wrap_content"
+            <!-- Row 2: Action Buttons (Equal width, 44dp height, no notch overlap) -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Recipes" />
+                android:layout_marginTop="12dp"
+                android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/btnSuggestMeal"
-                android:layout_width="wrap_content"
+                <!-- Recipes Action Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnRecipes"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:text="Recipes"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/on_primary"
+                    app:backgroundTint="#2EFFFFFF"
+                    app:strokeColor="#50FFFFFF"
+                    app:strokeWidth="1dp"
+                    app:cornerRadius="12dp"
+                    app:icon="@drawable/ic_recipes"
+                    app:iconSize="18dp"
+                    app:iconTint="#FFFFFF"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp" />
+
+                <!-- Suggest Meal Action Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSuggestMeal"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="10dp"
+                    android:text="Suggest Meal"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="#3D2100"
+                    app:backgroundTint="#FDF2E9"
+                    app:cornerRadius="12dp"
+                    app:icon="@drawable/ic_sparkle"
+                    app:iconSize="18dp"
+                    app:iconTint="@color/secondary"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp" />
+            </LinearLayout>
+
+            <!-- Row 3: Quick Stats (Pantry Items & Saved Recipes) -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:text="Suggest Meal" />
+                android:layout_marginTop="12dp"
+                android:orientation="horizontal">
+
+                <!-- Stat 1: Total Pantry Items -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_stat_badge"
+                    android:paddingVertical="8dp"
+                    android:paddingHorizontal="12dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_pantry"
+                        app:tint="#FFFFFF"
+                        android:contentDescription="Pantry Items" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvStatTotalItems"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textColor="@color/text_on_dark"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Pantry Items"
+                            android:textColor="@color/text_on_dark_secondary"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Stat 2: Number of Recipes -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="10dp"
+                    android:background="@drawable/bg_stat_badge"
+                    android:paddingVertical="8dp"
+                    android:paddingHorizontal="12dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_recipes"
+                        app:tint="#FFFFFF"
+                        android:contentDescription="Saved Recipes" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvStatTotalRecipes"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textColor="@color/text_on_dark"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Saved Recipes"
+                            android:textColor="@color/text_on_dark_secondary"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+            </LinearLayout>
+
         </LinearLayout>
 
-        <!-- Empty state shown when the pantry list has no items -->
-        <TextView
-            android:id="@+id/tvEmptyState"
+        <!-- Empty State Container -->
+        <LinearLayout
+            android:id="@+id/layoutEmptyState"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:gravity="center"
-            android:text="Your pantry is empty.\nTap + to add your first item."
-            android:textSize="16sp"
-            android:visibility="gone" />
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:visibility="gone">
 
-        <!-- Pantry items list -->
+            <ImageView
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:src="@drawable/ic_empty_box"
+                android:contentDescription="Empty Pantry" />
+
+            <TextView
+                android:id="@+id/tvEmptyState"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:gravity="center"
+                android:text="Your pantry is empty.\nTap + to add your first item."
+                android:textColor="@color/text_secondary"
+                android:textSize="15sp" />
+        </LinearLayout>
+
+        <!-- RecyclerView properly takes remaining height -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvPantryItems"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:clipToPadding="false"
-            android:padding="8dp" />
+            android:paddingTop="8dp"
+            android:paddingBottom="88dp"
+            android:clipToPadding="false" />
 
     </LinearLayout>
 
@@ -71,6 +224,9 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
         android:contentDescription="Add pantry item"
-        android:src="@android:drawable/ic_input_add" />
+        android:backgroundTint="@color/primary"
+        app:tint="@color/on_primary"
+        android:src="@drawable/ic_add"
+        app:elevation="4dp" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

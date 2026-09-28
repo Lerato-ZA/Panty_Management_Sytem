@@ -58,14 +58,15 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         Recipe recipe = recipes.get(position);
         holder.tvRecipeName.setText(recipe.getName());
 
-        String meta = "Cook time: " + recipe.getCookTimeMinutes() + " mins  •  Servings: " + recipe.getServings();
+        // Original meta format: "Cook time: X mins  •  Servings: Y"
+        String meta = "Cook time: " + recipe.getCookTimeMinutes() + " mins  \u2022  Servings: " + recipe.getServings();
         holder.tvRecipeMeta.setText(meta);
 
         StringBuilder ingText = new StringBuilder();
         List<RecipeIngredient> ingredients = ingredientsMap != null ? ingredientsMap.get(recipe.getId()) : null;
         if (ingredients != null && !ingredients.isEmpty()) {
             for (RecipeIngredient ing : ingredients) {
-                ingText.append("• ").append(ing.getIngredientName())
+                ingText.append("\u2022 ").append(ing.getIngredientName())
                         .append(" (").append(ing.getRequiredQuantity() % 1 == 0 ? (int) ing.getRequiredQuantity() : ing.getRequiredQuantity())
                         .append(" ").append(ing.getUnit()).append(")\n");
             }

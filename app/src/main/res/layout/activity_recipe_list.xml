@@ -2,50 +2,104 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/recipeListRoot"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/bg_page">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tvRecipeListTitle"
+        <!-- Top Header Bar with insets -->
+        <LinearLayout
+            android:id="@+id/layoutRecipeHeader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Recipe Collection"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="4dp" />
+            android:background="@drawable/bg_header_sub"
+            android:paddingHorizontal="16dp"
+            android:paddingBottom="14dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-        <TextView
-            android:id="@+id/tvRecipeListSubtitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="All saved recipes in your database:"
-            android:textSize="14sp"
-            android:textColor="#666666"
-            android:layout_marginBottom="16dp" />
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Back"
+                android:src="@drawable/ic_arrow_back"
+                app:tint="#FFFFFF" />
 
-        <TextView
-            android:id="@+id/tvEmptyRecipes"
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="10dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvRecipeListTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Recipe Collection"
+                    android:textColor="@color/text_on_dark"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvRecipeListSubtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="All saved recipes in your database:"
+                    android:textColor="@color/text_on_dark_secondary"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Empty state -->
+        <LinearLayout
+            android:id="@+id/layoutEmptyRecipes"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="48dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:gravity="center"
-            android:text="No recipes in your collection yet.\n\nTap + below to create your first recipe!"
-            android:textSize="16sp"
-            android:visibility="gone" />
+            android:padding="24dp"
+            android:orientation="vertical"
+            android:visibility="gone">
 
+            <ImageView
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:src="@drawable/ic_empty_recipe"
+                android:contentDescription="Empty Recipes" />
+
+            <TextView
+                android:id="@+id/tvEmptyRecipes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:gravity="center"
+                android:text="No recipes in your collection yet.\n\nTap + below to create your first recipe!"
+                android:textColor="@color/text_secondary"
+                android:textSize="15sp" />
+        </LinearLayout>
+
+        <!-- Recipes RecyclerView -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvRecipes"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:paddingTop="8dp"
+            android:paddingBottom="88dp"
+            android:clipToPadding="false" />
 
     </LinearLayout>
 
+    <!-- FAB to add a new recipe -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddRecipe"
         android:layout_width="wrap_content"
@@ -53,6 +107,9 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
         android:contentDescription="Add recipe"
-        android:src="@android:drawable/ic_input_add" />
+        android:backgroundTint="@color/secondary"
+        app:tint="@color/on_secondary"
+        android:src="@drawable/ic_add"
+        app:elevation="4dp" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

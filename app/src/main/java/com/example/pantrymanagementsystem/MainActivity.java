@@ -9,13 +9,15 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.pantrymanagementsystem.adapter.PantryAdapter;
 import com.example.pantrymanagementsystem.model.PantryItem;
 import com.example.pantrymanagementsystem.repository.PantryRepository;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +26,9 @@ public class MainActivity extends AppCompatActivity implements PantryAdapter.OnI
 
     private RecyclerView rvPantryItems;
     private TextView tvEmptyState;
+    private View layoutEmptyState;
+    private TextView tvStatTotalItems;
+    private TextView tvStatTotalRecipes;
     private PantryAdapter adapter;
     private PantryRepository repository;
 
@@ -35,11 +40,36 @@ public class MainActivity extends AppCompatActivity implements PantryAdapter.OnI
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Apply Edge-to-Edge System Bar and Cutout Insets
+        View mainRoot = findViewById(R.id.mainRoot);
+        View layoutHeader = findViewById(R.id.layoutHeader);
+        if (mainRoot != null) {
+            ViewCompat.setOnApplyWindowInsetsListener(mainRoot, (v, windowInsets) -> {
+                Insets insets = windowInsets.getInsets(
+                        WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout()
+                );
+                if (layoutHeader != null) {
+                    int extraTop = (int) (8 * getResources().getDisplayMetrics().density);
+                    layoutHeader.setPadding(
+                            layoutHeader.getPaddingLeft(),
+                            insets.top + extraTop,
+                            layoutHeader.getPaddingRight(),
+                            layoutHeader.getPaddingBottom()
+                    );
+                }
+                v.setPadding(insets.left, 0, insets.right, insets.bottom);
+                return windowInsets;
+            });
+        }
+
         repository = PantryRepository.getInstance(this);
 
         rvPantryItems = findViewById(R.id.rvPantryItems);
         tvEmptyState = findViewById(R.id.tvEmptyState);
-        FloatingActionButton fabAddItem = findViewById(R.id.fabAddItem);
+        layoutEmptyState = findViewById(R.id.layoutEmptyState);
+        tvStatTotalItems = findViewById(R.id.tvStatTotalItems);
+        tvStatTotalRecipes = findViewById(R.id.tvStatTotalRecipes);
+        View fabAddItem = findViewById(R.id.fabAddItem);
         View btnSuggestMeal = findViewById(R.id.btnSuggestMeal);
         View btnRecipes = findViewById(R.id.btnRecipes);
 
@@ -47,21 +77,23 @@ public class MainActivity extends AppCompatActivity implements PantryAdapter.OnI
         rvPantryItems.setLayoutManager(new LinearLayoutManager(this));
         rvPantryItems.setAdapter(adapter);
 
-        loadPantryItemsFromDb();
+        loadData();
 
         addEditItemLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == RESULT_OK) {
-                        loadPantryItemsFromDb();
+                        loadData();
                     }
                 }
         );
 
-        fabAddItem.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, AddEditItemActivity.class);
-            addEditItemLauncher.launch(intent);
-        });
+        if (fabAddItem != null) {
+            fabAddItem.setOnClickListener(v -> {
+                Intent intent = new Intent(MainActivity.this, AddEditItemActivity.class);
+                addEditItemLauncher.launch(intent);
+            });
+        }
 
         if (btnRecipes != null) {
             btnRecipes.setOnClickListener(v -> {
@@ -70,19 +102,21 @@ public class MainActivity extends AppCompatActivity implements PantryAdapter.OnI
             });
         }
 
-        btnSuggestMeal.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, MealSuggestionsActivity.class);
-            startActivity(intent);
-        });
+        if (btnSuggestMeal != null) {
+            btnSuggestMeal.setOnClickListener(v -> {
+                Intent intent = new Intent(MainActivity.this, MealSuggestionsActivity.class);
+                startActivity(intent);
+            });
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        loadPantryItemsFromDb();
+        loadData();
     }
 
-    private void loadPantryItemsFromDb() {
+    private void loadData() {
         repository.getAllPantryItems(entities -> {
             pantryItems.clear();
             if (entities != null) {
@@ -92,6 +126,13 @@ public class MainActivity extends AppCompatActivity implements PantryAdapter.OnI
             }
             adapter.updateItems(pantryItems);
             refreshEmptyState();
+        });
+
+        repository.getAllRecipes(recipes -> {
+            int recipeCount = (recipes != null) ? recipes.size() : 0;
+            if (tvStatTotalRecipes != null) {
+                tvStatTotalRecipes.setText(String.valueOf(recipeCount));
+            }
         });
     }
 
@@ -105,14 +146,25 @@ public class MainActivity extends AppCompatActivity implements PantryAdapter.OnI
     @Override
     public void onDeleteClicked(PantryItem item) {
         repository.deletePantryItem(item.getId(), success -> {
-            loadPantryItemsFromDb();
+            loadData();
             Toast.makeText(this, item.getName() + " removed", Toast.LENGTH_SHORT).show();
         });
     }
 
     private void refreshEmptyState() {
-        boolean isEmpty = pantryItems.isEmpty();
-        tvEmptyState.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
+        int count = pantryItems.size();
+        boolean isEmpty = (count == 0);
+
+        if (tvStatTotalItems != null) {
+            tvStatTotalItems.setText(String.valueOf(count));
+        }
+
+        if (layoutEmptyState != null) {
+            layoutEmptyState.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
+        } else if (tvEmptyState != null) {
+            tvEmptyState.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
+        }
+
         rvPantryItems.setVisibility(isEmpty ? View.GONE : View.VISIBLE);
     }
 }

@@ -2,11 +2,15 @@ package com.example.pantrymanagementsystem;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.example.pantrymanagementsystem.data.entity.Recipe;
 import com.example.pantrymanagementsystem.data.entity.RecipeIngredient;
@@ -31,6 +35,27 @@ public class AddRecipeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_recipe);
 
+        View root = findViewById(R.id.addRecipeRoot);
+        View header = findViewById(R.id.layoutRecipeFormHeader);
+        if (root != null) {
+            ViewCompat.setOnApplyWindowInsetsListener(root, (v, windowInsets) -> {
+                Insets insets = windowInsets.getInsets(
+                        WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout()
+                );
+                if (header != null) {
+                    int extraTop = (int) (8 * getResources().getDisplayMetrics().density);
+                    header.setPadding(
+                            header.getPaddingLeft(),
+                            insets.top + extraTop,
+                            header.getPaddingRight(),
+                            header.getPaddingBottom()
+                    );
+                }
+                v.setPadding(insets.left, 0, insets.right, insets.bottom);
+                return windowInsets;
+            });
+        }
+
         repository = PantryRepository.getInstance(this);
 
         tvFormTitle = findViewById(R.id.tvFormTitle);
@@ -40,13 +65,18 @@ public class AddRecipeActivity extends AppCompatActivity {
         etCookTime = findViewById(R.id.etCookTime);
         etServings = findViewById(R.id.etServings);
         btnSaveRecipe = findViewById(R.id.btnSaveRecipe);
+        View btnBack = findViewById(R.id.btnBack);
+
+        if (btnBack != null) {
+            btnBack.setOnClickListener(v -> finish());
+        }
 
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra("recipe_id")) {
             isEditMode = true;
             editingRecipeId = intent.getLongExtra("recipe_id", -1);
             if (tvFormTitle != null) tvFormTitle.setText("Edit Recipe");
-            btnSaveRecipe.setText("Update Recipe");
+            if (btnSaveRecipe != null) btnSaveRecipe.setText("Update Recipe");
 
             repository.getRecipeById(editingRecipeId, recipe -> {
                 if (recipe != null) {
@@ -68,7 +98,9 @@ public class AddRecipeActivity extends AppCompatActivity {
             });
         }
 
-        btnSaveRecipe.setOnClickListener(v -> attemptSaveRecipe());
+        if (btnSaveRecipe != null) {
+            btnSaveRecipe.setOnClickListener(v -> attemptSaveRecipe());
+        }
     }
 
     private void attemptSaveRecipe() {

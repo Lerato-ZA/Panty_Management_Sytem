@@ -5,6 +5,9 @@ import android.view.View;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -22,6 +25,7 @@ public class MealSuggestionsActivity extends AppCompatActivity {
 
     private RecyclerView rvSuggestedRecipes;
     private TextView tvEmptySuggestions;
+    private View layoutEmptySuggestions;
     private RecipeAdapter adapter;
     private PantryRepository repository;
 
@@ -33,10 +37,37 @@ public class MealSuggestionsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_meal_suggestions);
 
+        View root = findViewById(R.id.mealSuggestionsRoot);
+        View header = findViewById(R.id.layoutSuggestionsHeader);
+        if (root != null) {
+            ViewCompat.setOnApplyWindowInsetsListener(root, (v, windowInsets) -> {
+                Insets insets = windowInsets.getInsets(
+                        WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout()
+                );
+                if (header != null) {
+                    int extraTop = (int) (8 * getResources().getDisplayMetrics().density);
+                    header.setPadding(
+                            header.getPaddingLeft(),
+                            insets.top + extraTop,
+                            header.getPaddingRight(),
+                            header.getPaddingBottom()
+                    );
+                }
+                v.setPadding(insets.left, 0, insets.right, insets.bottom);
+                return windowInsets;
+            });
+        }
+
         repository = PantryRepository.getInstance(this);
 
         rvSuggestedRecipes = findViewById(R.id.rvSuggestedRecipes);
         tvEmptySuggestions = findViewById(R.id.tvEmptySuggestions);
+        layoutEmptySuggestions = findViewById(R.id.layoutEmptySuggestions);
+        View btnBack = findViewById(R.id.btnBack);
+
+        if (btnBack != null) {
+            btnBack.setOnClickListener(v -> finish());
+        }
 
         adapter = new RecipeAdapter(suggestedRecipes, ingredientsMap);
         rvSuggestedRecipes.setLayoutManager(new LinearLayoutManager(this));
@@ -50,13 +81,16 @@ public class MealSuggestionsActivity extends AppCompatActivity {
             suggestedRecipes.clear();
             ingredientsMap.clear();
 
-            if (recipes != null && !recipes.isEmpty()) {
+            boolean hasSuggestions = (recipes != null && !recipes.isEmpty());
+            if (hasSuggestions) {
                 suggestedRecipes.addAll(recipes);
                 if (map != null) ingredientsMap.putAll(map);
-                tvEmptySuggestions.setVisibility(View.GONE);
+                if (layoutEmptySuggestions != null) layoutEmptySuggestions.setVisibility(View.GONE);
+                if (tvEmptySuggestions != null) tvEmptySuggestions.setVisibility(View.GONE);
                 rvSuggestedRecipes.setVisibility(View.VISIBLE);
             } else {
-                tvEmptySuggestions.setVisibility(View.VISIBLE);
+                if (layoutEmptySuggestions != null) layoutEmptySuggestions.setVisibility(View.VISIBLE);
+                if (tvEmptySuggestions != null) tvEmptySuggestions.setVisibility(View.VISIBLE);
                 rvSuggestedRecipes.setVisibility(View.GONE);
             }
 

@@ -3,6 +3,7 @@ package com.example.pantrymanagementsystem;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
@@ -10,6 +11,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.example.pantrymanagementsystem.model.PantryItem;
 import com.example.pantrymanagementsystem.repository.PantryRepository;
@@ -29,7 +33,6 @@ public class AddEditItemActivity extends AppCompatActivity {
     private boolean isEditMode = false;
     private long editingItemId = -1;
 
-    // Categories
     private final String[] categories = {
             "Grains", "Vegetables", "Fruits", "Meat", "Dairy", "Canned Goods", "Spices", "Other"
     };
@@ -38,6 +41,27 @@ public class AddEditItemActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_edit_item);
+
+        View root = findViewById(R.id.addEditItemRoot);
+        View header = findViewById(R.id.layoutFormHeader);
+        if (root != null) {
+            ViewCompat.setOnApplyWindowInsetsListener(root, (v, windowInsets) -> {
+                Insets insets = windowInsets.getInsets(
+                        WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout()
+                );
+                if (header != null) {
+                    int extraTop = (int) (8 * getResources().getDisplayMetrics().density);
+                    header.setPadding(
+                            header.getPaddingLeft(),
+                            insets.top + extraTop,
+                            header.getPaddingRight(),
+                            header.getPaddingBottom()
+                    );
+                }
+                v.setPadding(insets.left, 0, insets.right, insets.bottom);
+                return windowInsets;
+            });
+        }
 
         repository = PantryRepository.getInstance(this);
 
@@ -48,6 +72,11 @@ public class AddEditItemActivity extends AppCompatActivity {
         etExpiryDate = findViewById(R.id.etExpiryDate);
         spinnerCategory = findViewById(R.id.spinnerCategory);
         btnSaveItem = findViewById(R.id.btnSaveItem);
+        View btnBack = findViewById(R.id.btnBack);
+
+        if (btnBack != null) {
+            btnBack.setOnClickListener(v -> finish());
+        }
 
         ArrayAdapter<String> categoryAdapter = new ArrayAdapter<>(
                 this, android.R.layout.simple_spinner_dropdown_item, categories);
@@ -59,8 +88,8 @@ public class AddEditItemActivity extends AppCompatActivity {
         if (intent != null && intent.hasExtra("item_id")) {
             isEditMode = true;
             editingItemId = intent.getLongExtra("item_id", -1);
-            tvFormTitle.setText("Edit Pantry Item");
-            btnSaveItem.setText("Update Item");
+            if (tvFormTitle != null) tvFormTitle.setText("Edit Pantry Item");
+            if (btnSaveItem != null) btnSaveItem.setText("Update Item");
 
             repository.getPantryItemById(editingItemId, entity -> {
                 if (entity != null) {
@@ -84,7 +113,9 @@ public class AddEditItemActivity extends AppCompatActivity {
             });
         }
 
-        btnSaveItem.setOnClickListener(v -> attemptSave());
+        if (btnSaveItem != null) {
+            btnSaveItem.setOnClickListener(v -> attemptSave());
+        }
     }
 
     private void showDatePicker() {

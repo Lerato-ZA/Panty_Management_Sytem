@@ -1,5 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- Brand Primary - Fresh Kitchen Sage -->
+    <color name="primary">#1B6E4B</color>
+    <color name="primary_dark">#124E34</color>
+    <color name="primary_light">#EAF5EE</color>
+    <color name="primary_container">#D1EEDC</color>
+    <color name="on_primary">#FFFFFF</color>
+    <color name="on_primary_container">#062D1C</color>
+
+    <!-- Warm Accent - Terracotta / Culinary Amber -->
+    <color name="secondary">#D97736</color>
+    <color name="secondary_dark">#A65420</color>
+    <color name="secondary_light">#FDF1E9</color>
+    <color name="secondary_container">#FDE2D2</color>
+    <color name="on_secondary">#FFFFFF</color>
+    <color name="on_secondary_container">#421A04</color>
+
+    <!-- Tertiary Accent - Fresh Teal / Mint -->
+    <color name="tertiary">#2F7C73</color>
+    <color name="tertiary_light">#E4F4F2</color>
+    <color name="tertiary_container">#CEEDE9</color>
+
+    <!-- Backgrounds & Surfaces -->
+    <color name="bg_page">#F7FAF8</color>
+    <color name="bg_surface">#FFFFFF</color>
+    <color name="bg_surface_subtle">#F1F5F2</color>
+    <color name="card_stroke">#E2E8E4</color>
+    <color name="card_stroke_subtle">#EDF2EE</color>
+    <color name="divider">#E8ECE9</color>
+
+    <!-- Typography -->
+    <color name="text_headline">#141D17</color>
+    <color name="text_primary">#1D2921</color>
+    <color name="text_secondary">#57665E</color>
+    <color name="text_tertiary">#8A9991</color>
+    <color name="text_on_dark">#FFFFFF</color>
+    <color name="text_on_dark_secondary">#D2E7DC</color>
+
+    <!-- Food Category Colors -->
+    <color name="cat_grains">#D97706</color>
+    <color name="cat_grains_bg">#FEF3C7</color>
+    <color name="cat_vegetables">#15803D</color>
+    <color name="cat_vegetables_bg">#DCFCE7</color>
+    <color name="cat_fruits">#BE185D</color>
+    <color name="cat_fruits_bg">#FCE7F3</color>
+    <color name="cat_meat">#B91C1C</color>
+    <color name="cat_meat_bg">#FEE2E2</color>
+    <color name="cat_dairy">#1D4ED8</color>
+    <color name="cat_dairy_bg">#DBEAFE</color>
+    <color name="cat_canned">#7C3AED</color>
+    <color name="cat_canned_bg">#EDE9FE</color>
+    <color name="cat_spices">#C2410C</color>
+    <color name="cat_spices_bg">#FFEDD5</color>
+    <color name="cat_other">#4B5563</color>
+    <color name="cat_other_bg">#F3F4F6</color>
+
+    <!-- Status & Alerts -->
+    <color name="status_fresh">#16A34A</color>
+    <color name="status_fresh_bg">#DCFCE7</color>
+    <color name="status_warning">#EA580C</color>
+    <color name="status_warning_bg">#FFEDD5</color>
+    <color name="status_expired">#DC2626</color>
+    <color name="status_expired_bg">#FEE2E2</color>
+
+    <!-- Basics -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="ripple_green">#261B6E4B</color>
+    <color name="ripple_red">#26DC2626</color>
 </resources>
