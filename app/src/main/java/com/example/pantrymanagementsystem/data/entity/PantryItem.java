@@ -1,13 +1,15 @@
 package com.example.pantrymanagementsystem.data.entity;
 
+
+// Item class
 public class  PantryItem {
 
     private long id;
     private String name;
     private double quantity;
-    private String unit;          // "g", "ml", "pcs", etc.
-    private String category;      // "Grain", "Dairy", "Produce", etc.
-    private Long expiryDate;      // null if never expires
+    private String unit;
+    private String category;
+    private Long expiryDate;
     private long dateAdded;
 
     public PantryItem(String name, double quantity, String unit,
@@ -20,6 +22,7 @@ public class  PantryItem {
         this.dateAdded = dateAdded;
     }
 
+    // Getters and setters
     public long getId() { return id; }
     public void setId(long id) { this.id = id; }
 

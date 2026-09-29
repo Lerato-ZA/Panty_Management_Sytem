@@ -16,6 +16,7 @@ public class RecipeIngredient {
         this.unit = unit;
     }
 
+    // Getters and setters
     public long getId() { return id; }
     public void setId(long id) { this.id = id; }
 

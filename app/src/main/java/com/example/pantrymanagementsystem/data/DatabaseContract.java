@@ -26,8 +26,12 @@ public final class DatabaseContract {
 
     public static class RecipeIngredientEntry implements BaseColumns {
         public static final String TABLE_NAME = "recipe_ingredients";
-        public static final String COLUMN_RECIPE_ID = "recipe_id";           // FK -> recipes._id
-        public static final String COLUMN_INGREDIENT_NAME = "ingredient_name"; // matched vs pantry_items.name
+
+        // FK -> recipes._id
+        public static final String COLUMN_RECIPE_ID = "recipe_id";
+
+        // matched vs pantry_items.name
+        public static final String COLUMN_INGREDIENT_NAME = "ingredient_name";
         public static final String COLUMN_REQUIRED_QUANTITY = "required_quantity";
         public static final String COLUMN_UNIT = "unit";
     }

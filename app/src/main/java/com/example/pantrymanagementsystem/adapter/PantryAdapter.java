@@ -86,6 +86,7 @@ public class PantryAdapter extends RecyclerView.Adapter<PantryAdapter.PantryView
         });
     }
 
+    // Icons for food category
     private String getCategoryEmoji(String category) {
         switch (category.toLowerCase()) {
             case "grains": return "\uD83C\uDF3E";

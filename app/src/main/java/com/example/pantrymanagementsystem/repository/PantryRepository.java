@@ -92,12 +92,7 @@ public class PantryRepository {
         });
     }
 
-    public void searchPantryItems(String query, Callback<List<PantryItem>> callback) {
-        executor.execute(() -> {
-            List<PantryItem> items = pantryItemDao.search(query);
-            mainHandler.post(() -> callback.onComplete(items));
-        });
-    }
+
 
     // Recipe Operations
 

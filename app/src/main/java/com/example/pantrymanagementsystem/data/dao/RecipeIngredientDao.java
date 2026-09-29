@@ -54,30 +54,11 @@ public class RecipeIngredientDao {
         return ingredients;
     }
 
-    public List<RecipeIngredient> getAll() {
-        List<RecipeIngredient> ingredients = new ArrayList<>();
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        try (Cursor cursor = db.query(RecipeIngredientEntry.TABLE_NAME, null,
-                null, null, null, null, null)) {
-            while (cursor.moveToNext()) {
-                ingredients.add(fromCursor(cursor));
-            }
-        }
-        return ingredients;
-    }
-
     public int update(RecipeIngredient ingredient) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         String selection = RecipeIngredientEntry._ID + " = ?";
         String[] args = { String.valueOf(ingredient.getId()) };
         return db.update(RecipeIngredientEntry.TABLE_NAME, toContentValues(ingredient), selection, args);
-    }
-
-    public int delete(long id) {
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        String selection = RecipeIngredientEntry._ID + " = ?";
-        String[] args = { String.valueOf(id) };
-        return db.delete(RecipeIngredientEntry.TABLE_NAME, selection, args);
     }
 
     public int deleteForRecipe(long recipeId) {

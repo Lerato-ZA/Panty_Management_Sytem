@@ -12,7 +12,7 @@ import com.example.pantrymanagementsystem.data.entity.PantryItem;
 import java.util.ArrayList;
 import java.util.List;
 
-// SQLite Operations
+// Database (SQLite) Operations (CRUD)
 public class PantryItemDao {
 
     private final DatabaseHelper dbHelper;
@@ -27,7 +27,7 @@ public class PantryItemDao {
         return db.insert(PantryItemEntry.TABLE_NAME, null, toContentValues(item));
     }
 
-    // Read
+    // Read from the db
     public PantryItem getById(long id) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String selection = PantryItemEntry._ID + " = ?";
@@ -66,23 +66,7 @@ public class PantryItemDao {
         return items;
     }
 
-    public List<PantryItem> getExpiringBefore(long thresholdEpochMillis) {
-        List<PantryItem> items = new ArrayList<>();
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        String selection = PantryItemEntry.COLUMN_EXPIRY_DATE + " IS NOT NULL AND " +
-                PantryItemEntry.COLUMN_EXPIRY_DATE + " <= ?";
-        String[] args = { String.valueOf(thresholdEpochMillis) };
-        String orderBy = PantryItemEntry.COLUMN_EXPIRY_DATE + " ASC";
-        try (Cursor cursor = db.query(PantryItemEntry.TABLE_NAME, null,
-                selection, args, null, null, orderBy)) {
-            while (cursor.moveToNext()) {
-                items.add(fromCursor(cursor));
-            }
-        }
-        return items;
-    }
-
-    //  Update
+    // Update
     public int update(PantryItem item) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         String selection = PantryItemEntry._ID + " = ?";
@@ -90,7 +74,7 @@ public class PantryItemDao {
         return db.update(PantryItemEntry.TABLE_NAME, toContentValues(item), selection, args);
     }
 
-    //  Delete
+    // Delete
     public int delete(long id) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         String selection = PantryItemEntry._ID + " = ?";
@@ -98,7 +82,7 @@ public class PantryItemDao {
         return db.delete(PantryItemEntry.TABLE_NAME, selection, args);
     }
 
-    //  Mapping helpers
+    // Mapping helpers
     private ContentValues toContentValues(PantryItem item) {
         ContentValues values = new ContentValues();
         values.put(PantryItemEntry.COLUMN_NAME, item.getName());
