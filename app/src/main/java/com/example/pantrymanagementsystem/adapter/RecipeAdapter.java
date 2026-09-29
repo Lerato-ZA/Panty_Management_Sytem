@@ -11,8 +11,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.pantrymanagementsystem.R;
-import com.example.pantrymanagementsystem.data.entity.Recipe;
-import com.example.pantrymanagementsystem.data.entity.RecipeIngredient;
+import com.example.pantrymanagementsystem.data.entity.RecipeIngredientEntity;
+import com.example.pantrymanagementsystem.model.Recipe;
 
 import java.util.List;
 import java.util.Map;
@@ -25,21 +25,21 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
     }
 
     private List<Recipe> recipes;
-    private Map<Long, List<RecipeIngredient>> ingredientsMap;
+    private Map<Long, List<RecipeIngredientEntity>> ingredientsMap;
     private final OnRecipeActionListener listener;
 
-    public RecipeAdapter(List<Recipe> recipes, Map<Long, List<RecipeIngredient>> ingredientsMap) {
+    public RecipeAdapter(List<Recipe> recipes, Map<Long, List<RecipeIngredientEntity>> ingredientsMap) {
         this(recipes, ingredientsMap, null);
     }
 
-    public RecipeAdapter(List<Recipe> recipes, Map<Long, List<RecipeIngredient>> ingredientsMap, OnRecipeActionListener listener) {
+    public RecipeAdapter(List<Recipe> recipes, Map<Long, List<RecipeIngredientEntity>> ingredientsMap, OnRecipeActionListener listener) {
         this.recipes = recipes;
         this.ingredientsMap = ingredientsMap;
         this.listener = listener;
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    public void updateData(List<Recipe> newRecipes, Map<Long, List<RecipeIngredient>> newMap) {
+    public void updateData(List<Recipe> newRecipes, Map<Long, List<RecipeIngredientEntity>> newMap) {
         this.recipes = newRecipes;
         this.ingredientsMap = newMap;
         notifyDataSetChanged();
@@ -58,14 +58,13 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         Recipe recipe = recipes.get(position);
         holder.tvRecipeName.setText(recipe.getName());
 
-        // Original meta format: "Cook time: X mins  •  Servings: Y"
         String meta = "Cook time: " + recipe.getCookTimeMinutes() + " mins  \u2022  Servings: " + recipe.getServings();
         holder.tvRecipeMeta.setText(meta);
 
         StringBuilder ingText = new StringBuilder();
-        List<RecipeIngredient> ingredients = ingredientsMap != null ? ingredientsMap.get(recipe.getId()) : null;
+        List<RecipeIngredientEntity> ingredients = ingredientsMap != null ? ingredientsMap.get(recipe.getId()) : null;
         if (ingredients != null && !ingredients.isEmpty()) {
-            for (RecipeIngredient ing : ingredients) {
+            for (RecipeIngredientEntity ing : ingredients) {
                 ingText.append("\u2022 ").append(ing.getIngredientName())
                         .append(" (").append(ing.getRequiredQuantity() % 1 == 0 ? (int) ing.getRequiredQuantity() : ing.getRequiredQuantity())
                         .append(" ").append(ing.getUnit()).append(")\n");

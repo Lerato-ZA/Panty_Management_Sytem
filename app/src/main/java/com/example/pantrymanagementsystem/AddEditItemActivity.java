@@ -11,12 +11,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.example.pantrymanagementsystem.model.PantryItem;
-import com.example.pantrymanagementsystem.repository.PantryRepository;
+import com.example.pantrymanagementsystem.service.PantryService;
+import com.example.pantrymanagementsystem.util.UiUtils;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.Calendar;
@@ -29,7 +27,7 @@ public class AddEditItemActivity extends AppCompatActivity {
     private TextView tvFormTitle;
     private Button btnSaveItem;
 
-    private PantryRepository repository;
+    private PantryService pantryService;
     private boolean isEditMode = false;
     private long editingItemId = -1;
 
@@ -44,26 +42,9 @@ public class AddEditItemActivity extends AppCompatActivity {
 
         View root = findViewById(R.id.addEditItemRoot);
         View header = findViewById(R.id.layoutFormHeader);
-        if (root != null) {
-            ViewCompat.setOnApplyWindowInsetsListener(root, (v, windowInsets) -> {
-                Insets insets = windowInsets.getInsets(
-                        WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout()
-                );
-                if (header != null) {
-                    int extraTop = (int) (8 * getResources().getDisplayMetrics().density);
-                    header.setPadding(
-                            header.getPaddingLeft(),
-                            insets.top + extraTop,
-                            header.getPaddingRight(),
-                            header.getPaddingBottom()
-                    );
-                }
-                v.setPadding(insets.left, 0, insets.right, insets.bottom);
-                return windowInsets;
-            });
-        }
+        UiUtils.applyEdgeToEdge(root, header);
 
-        repository = PantryRepository.getInstance(this);
+        pantryService = PantryService.getInstance(this);
 
         tvFormTitle = findViewById(R.id.tvFormTitle);
         etItemName = findViewById(R.id.etItemName);
@@ -91,9 +72,8 @@ public class AddEditItemActivity extends AppCompatActivity {
             if (tvFormTitle != null) tvFormTitle.setText("Edit Pantry Item");
             if (btnSaveItem != null) btnSaveItem.setText("Update Item");
 
-            repository.getPantryItemById(editingItemId, entity -> {
-                if (entity != null) {
-                    PantryItem item = PantryItem.fromEntity(entity);
+            pantryService.getPantryItemById(editingItemId, item -> {
+                if (item != null) {
                     etItemName.setText(item.getName());
                     etQuantity.setText(String.valueOf(item.getQuantity()));
                     etSize.setText(item.getSize());
@@ -154,13 +134,13 @@ public class AddEditItemActivity extends AppCompatActivity {
         PantryItem uiItem = new PantryItem(editingItemId, name, quantity, size.isEmpty() ? "1 pcs" : size, category, expiry.isEmpty() ? null : expiry);
 
         if (isEditMode) {
-            repository.updatePantryItem(uiItem.toEntity(), success -> {
+            pantryService.updatePantryItem(uiItem, success -> {
                 Toast.makeText(this, name + " updated", Toast.LENGTH_SHORT).show();
                 setResult(RESULT_OK);
                 finish();
             });
         } else {
-            repository.insertPantryItem(uiItem.toEntity(), newId -> {
+            pantryService.insertPantryItem(uiItem, newId -> {
                 Toast.makeText(this, name + " saved to database", Toast.LENGTH_SHORT).show();
                 setResult(RESULT_OK);
                 finish();

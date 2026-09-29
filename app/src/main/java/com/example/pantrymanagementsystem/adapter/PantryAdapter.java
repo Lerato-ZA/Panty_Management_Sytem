@@ -64,7 +64,6 @@ public class PantryAdapter extends RecyclerView.Adapter<PantryAdapter.PantryView
             holder.layoutCategoryAvatar.setBackground(shape);
         }
 
-        // Original details format: "Size: 2 kg  •  Qty: 1  •  Category: Grains"
         String details = "Size: " + item.getSize() + "  \u2022  Qty: " + item.getQuantity()
                 + "  \u2022  Category: " + category;
         holder.tvItemDetails.setText(details);
@@ -72,7 +71,7 @@ public class PantryAdapter extends RecyclerView.Adapter<PantryAdapter.PantryView
         if (holder.tvItemExpiry != null) {
             if (item.getExpiryDate() != null && !item.getExpiryDate().trim().isEmpty()) {
                 holder.tvItemExpiry.setVisibility(View.VISIBLE);
-                holder.tvItemExpiry.setText("\uD83D\uDCC5 Expiry: " + item.getExpiryDate());
+                holder.tvItemExpiry.setText("Expiry: " + item.getExpiryDate());
             } else {
                 holder.tvItemExpiry.setVisibility(View.GONE);
             }
@@ -88,14 +87,14 @@ public class PantryAdapter extends RecyclerView.Adapter<PantryAdapter.PantryView
 
     private String getCategoryEmoji(String category) {
         switch (category.toLowerCase()) {
-            case "grains": return "\uD83C\uDF3E";
-            case "vegetables": return "\uD83E\uDD66";
-            case "fruits": return "\uD83C\uDF4E";
-            case "meat": return "\uD83E\uDD69";
-            case "dairy": return "\uD83E\uDDC8";
-            case "canned goods": return "\uD83E\uDD6B";
-            case "spices": return "\uD83E\uDDC2";
-            default: return "\uD83E\uDD58";
+            case "grains": return "🌾";
+            case "vegetables": return "🥦";
+            case "fruits": return "🍎";
+            case "meat": return "🥩";
+            case "dairy": return "🧀";
+            case "canned goods": return "🥫";
+            case "spices": return "🧂";
+            default: return "🥣";
         }
     }
 

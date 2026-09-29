@@ -1,17 +1,17 @@
 package com.example.pantrymanagementsystem.data.entity;
 
-public class  PantryItem {
+public class PantryItemEntity {
 
     private long id;
     private String name;
     private double quantity;
-    private String unit;          // "g", "ml", "pcs", etc.
-    private String category;      // "Grain", "Dairy", "Produce", etc.
-    private Long expiryDate;      // null if never expires
+    private String unit;
+    private String category;
+    private Long expiryDate;
     private long dateAdded;
 
-    public PantryItem(String name, double quantity, String unit,
-                      String category, Long expiryDate, long dateAdded) {
+    public PantryItemEntity(String name, double quantity, String unit,
+                            String category, Long expiryDate, long dateAdded) {
         this.name = name;
         this.quantity = quantity;
         this.unit = unit;

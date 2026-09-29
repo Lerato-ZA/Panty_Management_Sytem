@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.example.pantrymanagementsystem.data.DatabaseContract.RecipeEntry;
 import com.example.pantrymanagementsystem.data.DatabaseHelper;
-import com.example.pantrymanagementsystem.data.entity.Recipe;
+import com.example.pantrymanagementsystem.data.entity.RecipeEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,12 +20,12 @@ public class RecipeDao {
         this.dbHelper = DatabaseHelper.getInstance(context);
     }
 
-    public long insert(Recipe recipe) {
+    public long insert(RecipeEntity recipe) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         return db.insert(RecipeEntry.TABLE_NAME, null, toContentValues(recipe));
     }
 
-    public Recipe getById(long id) {
+    public RecipeEntity getById(long id) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String selection = RecipeEntry._ID + " = ?";
         String[] args = { String.valueOf(id) };
@@ -35,8 +35,8 @@ public class RecipeDao {
         }
     }
 
-    public List<Recipe> getAll() {
-        List<Recipe> recipes = new ArrayList<>();
+    public List<RecipeEntity> getAll() {
+        List<RecipeEntity> recipes = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String orderBy = RecipeEntry.COLUMN_NAME + " ASC";
         try (Cursor cursor = db.query(RecipeEntry.TABLE_NAME, null,
@@ -48,7 +48,7 @@ public class RecipeDao {
         return recipes;
     }
 
-    public int update(Recipe recipe) {
+    public int update(RecipeEntity recipe) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         String selection = RecipeEntry._ID + " = ?";
         String[] args = { String.valueOf(recipe.getId()) };
@@ -59,12 +59,10 @@ public class RecipeDao {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         String selection = RecipeEntry._ID + " = ?";
         String[] args = { String.valueOf(id) };
-        // Matching recipe_ingredients rows are removed automatically via
-        // ON DELETE CASCADE (foreign keys enabled in DatabaseHelper).
         return db.delete(RecipeEntry.TABLE_NAME, selection, args);
     }
 
-    private ContentValues toContentValues(Recipe recipe) {
+    private ContentValues toContentValues(RecipeEntity recipe) {
         ContentValues values = new ContentValues();
         values.put(RecipeEntry.COLUMN_NAME, recipe.getName());
         values.put(RecipeEntry.COLUMN_INSTRUCTIONS, recipe.getInstructions());
@@ -73,14 +71,14 @@ public class RecipeDao {
         return values;
     }
 
-    private Recipe fromCursor(Cursor cursor) {
+    private RecipeEntity fromCursor(Cursor cursor) {
         long id = cursor.getLong(cursor.getColumnIndexOrThrow(RecipeEntry._ID));
         String name = cursor.getString(cursor.getColumnIndexOrThrow(RecipeEntry.COLUMN_NAME));
         String instructions = cursor.getString(cursor.getColumnIndexOrThrow(RecipeEntry.COLUMN_INSTRUCTIONS));
         int cookTime = cursor.getInt(cursor.getColumnIndexOrThrow(RecipeEntry.COLUMN_COOK_TIME_MINUTES));
         int servings = cursor.getInt(cursor.getColumnIndexOrThrow(RecipeEntry.COLUMN_SERVINGS));
 
-        Recipe recipe = new Recipe(name, instructions, cookTime, servings);
+        RecipeEntity recipe = new RecipeEntity(name, instructions, cookTime, servings);
         recipe.setId(id);
         return recipe;
     }
