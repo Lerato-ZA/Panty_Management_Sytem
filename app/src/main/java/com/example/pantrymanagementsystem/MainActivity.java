@@ -9,15 +9,13 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.pantrymanagementsystem.adapter.PantryAdapter;
 import com.example.pantrymanagementsystem.model.PantryItem;
-import com.example.pantrymanagementsystem.repository.PantryRepository;
+import com.example.pantrymanagementsystem.service.PantryService;
+import com.example.pantrymanagementsystem.util.UiUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,9 +28,9 @@ public class MainActivity extends AppCompatActivity implements PantryAdapter.OnI
     private TextView tvStatTotalItems;
     private TextView tvStatTotalRecipes;
     private PantryAdapter adapter;
-    private PantryRepository repository;
+    private PantryService pantryService;
 
-    private List<PantryItem> pantryItems = new ArrayList<>();
+    private final List<PantryItem> pantryItems = new ArrayList<>();
     private ActivityResultLauncher<Intent> addEditItemLauncher;
 
     @Override
@@ -40,29 +38,11 @@ public class MainActivity extends AppCompatActivity implements PantryAdapter.OnI
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Apply Edge-to-Edge System Bar and Cutout Insets
         View mainRoot = findViewById(R.id.mainRoot);
         View layoutHeader = findViewById(R.id.layoutHeader);
-        if (mainRoot != null) {
-            ViewCompat.setOnApplyWindowInsetsListener(mainRoot, (v, windowInsets) -> {
-                Insets insets = windowInsets.getInsets(
-                        WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout()
-                );
-                if (layoutHeader != null) {
-                    int extraTop = (int) (8 * getResources().getDisplayMetrics().density);
-                    layoutHeader.setPadding(
-                            layoutHeader.getPaddingLeft(),
-                            insets.top + extraTop,
-                            layoutHeader.getPaddingRight(),
-                            layoutHeader.getPaddingBottom()
-                    );
-                }
-                v.setPadding(insets.left, 0, insets.right, insets.bottom);
-                return windowInsets;
-            });
-        }
+        UiUtils.applyEdgeToEdge(mainRoot, layoutHeader);
 
-        repository = PantryRepository.getInstance(this);
+        pantryService = PantryService.getInstance(this);
 
         rvPantryItems = findViewById(R.id.rvPantryItems);
         tvEmptyState = findViewById(R.id.tvEmptyState);
@@ -117,18 +97,16 @@ public class MainActivity extends AppCompatActivity implements PantryAdapter.OnI
     }
 
     private void loadData() {
-        repository.getAllPantryItems(entities -> {
+        pantryService.getAllPantryItems(items -> {
             pantryItems.clear();
-            if (entities != null) {
-                for (com.example.pantrymanagementsystem.data.entity.PantryItem entity : entities) {
-                    pantryItems.add(PantryItem.fromEntity(entity));
-                }
+            if (items != null) {
+                pantryItems.addAll(items);
             }
             adapter.updateItems(pantryItems);
             refreshEmptyState();
         });
 
-        repository.getAllRecipes(recipes -> {
+        pantryService.getAllRecipes(recipes -> {
             int recipeCount = (recipes != null) ? recipes.size() : 0;
             if (tvStatTotalRecipes != null) {
                 tvStatTotalRecipes.setText(String.valueOf(recipeCount));
@@ -145,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements PantryAdapter.OnI
 
     @Override
     public void onDeleteClicked(PantryItem item) {
-        repository.deletePantryItem(item.getId(), success -> {
+        pantryService.deletePantryItem(item.getId(), success -> {
             loadData();
             Toast.makeText(this, item.getName() + " removed", Toast.LENGTH_SHORT).show();
         });

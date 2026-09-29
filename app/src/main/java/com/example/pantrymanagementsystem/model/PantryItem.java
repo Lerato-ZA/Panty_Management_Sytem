@@ -1,10 +1,5 @@
 package com.example.pantrymanagementsystem.model;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-
-// UI model for a pantry item
 public class PantryItem {
 
     private long id;
@@ -43,44 +38,4 @@ public class PantryItem {
 
     public String getExpiryDate() { return expiryDate; }
     public void setExpiryDate(String expiryDate) { this.expiryDate = expiryDate; }
-
-    // Converts UI model to database entity
-    public com.example.pantrymanagementsystem.data.entity.PantryItem toEntity() {
-        Long expiryMillis = null;
-        if (expiryDate != null && !expiryDate.trim().isEmpty()) {
-            try {
-                Date d = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).parse(expiryDate.trim());
-                if (d != null) expiryMillis = d.getTime();
-            } catch (Exception ignored) {
-            }
-        }
-        com.example.pantrymanagementsystem.data.entity.PantryItem entity =
-                new com.example.pantrymanagementsystem.data.entity.PantryItem(
-                        name,
-                        quantity,
-                        size != null && !size.trim().isEmpty() ? size : "pcs",
-                        category != null ? category : "Other",
-                        expiryMillis,
-                        System.currentTimeMillis()
-                );
-        entity.setId(id);
-        return entity;
-    }
-
-    // Creates UI model from database entity
-    public static PantryItem fromEntity(com.example.pantrymanagementsystem.data.entity.PantryItem entity) {
-        if (entity == null) return null;
-        String expiryStr = null;
-        if (entity.getExpiryDate() != null) {
-            expiryStr = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date(entity.getExpiryDate()));
-        }
-        return new PantryItem(
-                entity.getId(),
-                entity.getName(),
-                (int) entity.getQuantity(),
-                entity.getUnit(),
-                entity.getCategory(),
-                expiryStr
-        );
-    }
 }

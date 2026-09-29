@@ -8,13 +8,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
-import com.example.pantrymanagementsystem.data.entity.Recipe;
-import com.example.pantrymanagementsystem.data.entity.RecipeIngredient;
-import com.example.pantrymanagementsystem.repository.PantryRepository;
+import com.example.pantrymanagementsystem.data.entity.RecipeIngredientEntity;
+import com.example.pantrymanagementsystem.model.Recipe;
+import com.example.pantrymanagementsystem.service.PantryService;
+import com.example.pantrymanagementsystem.util.UiUtils;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.ArrayList;
@@ -25,7 +23,7 @@ public class AddRecipeActivity extends AppCompatActivity {
     private TextInputEditText etRecipeName, etIngredients, etInstructions, etCookTime, etServings;
     private TextView tvFormTitle;
     private Button btnSaveRecipe;
-    private PantryRepository repository;
+    private PantryService pantryService;
 
     private boolean isEditMode = false;
     private long editingRecipeId = -1;
@@ -37,26 +35,9 @@ public class AddRecipeActivity extends AppCompatActivity {
 
         View root = findViewById(R.id.addRecipeRoot);
         View header = findViewById(R.id.layoutRecipeFormHeader);
-        if (root != null) {
-            ViewCompat.setOnApplyWindowInsetsListener(root, (v, windowInsets) -> {
-                Insets insets = windowInsets.getInsets(
-                        WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout()
-                );
-                if (header != null) {
-                    int extraTop = (int) (8 * getResources().getDisplayMetrics().density);
-                    header.setPadding(
-                            header.getPaddingLeft(),
-                            insets.top + extraTop,
-                            header.getPaddingRight(),
-                            header.getPaddingBottom()
-                    );
-                }
-                v.setPadding(insets.left, 0, insets.right, insets.bottom);
-                return windowInsets;
-            });
-        }
+        UiUtils.applyEdgeToEdge(root, header);
 
-        repository = PantryRepository.getInstance(this);
+        pantryService = PantryService.getInstance(this);
 
         tvFormTitle = findViewById(R.id.tvFormTitle);
         etRecipeName = findViewById(R.id.etRecipeName);
@@ -78,17 +59,17 @@ public class AddRecipeActivity extends AppCompatActivity {
             if (tvFormTitle != null) tvFormTitle.setText("Edit Recipe");
             if (btnSaveRecipe != null) btnSaveRecipe.setText("Update Recipe");
 
-            repository.getRecipeById(editingRecipeId, recipe -> {
+            pantryService.getRecipeById(editingRecipeId, recipe -> {
                 if (recipe != null) {
                     etRecipeName.setText(recipe.getName());
                     etInstructions.setText(recipe.getInstructions());
                     etCookTime.setText(String.valueOf(recipe.getCookTimeMinutes()));
                     etServings.setText(String.valueOf(recipe.getServings()));
 
-                    repository.getIngredientsForRecipe(editingRecipeId, ingredients -> {
+                    pantryService.getIngredientsForRecipe(editingRecipeId, ingredients -> {
                         if (ingredients != null && !ingredients.isEmpty()) {
                             StringBuilder sb = new StringBuilder();
-                            for (RecipeIngredient ing : ingredients) {
+                            for (RecipeIngredientEntity ing : ingredients) {
                                 sb.append(ing.getIngredientName()).append("\n");
                             }
                             etIngredients.setText(sb.toString().trim());
@@ -139,26 +120,25 @@ public class AddRecipeActivity extends AppCompatActivity {
             }
         }
 
-        Recipe recipe = new Recipe(name, instructions, cookTime, servings);
+        Recipe recipe = new Recipe(editingRecipeId > 0 ? editingRecipeId : 0, name, instructions, cookTime, servings);
 
-        List<RecipeIngredient> ingredientList = new ArrayList<>();
+        List<RecipeIngredientEntity> ingredientList = new ArrayList<>();
         String[] lines = ingredientsRaw.split("\n");
         for (String line : lines) {
             String trimmed = line.trim();
             if (!trimmed.isEmpty()) {
-                ingredientList.add(new RecipeIngredient(editingRecipeId > 0 ? editingRecipeId : 0, trimmed, 1.0, "unit"));
+                ingredientList.add(new RecipeIngredientEntity(editingRecipeId > 0 ? editingRecipeId : 0, trimmed, 1.0, "unit"));
             }
         }
 
         if (isEditMode) {
-            recipe.setId(editingRecipeId);
-            repository.updateRecipe(recipe, ingredientList, success -> {
+            pantryService.updateRecipe(recipe, ingredientList, success -> {
                 Toast.makeText(this, "Recipe '" + name + "' updated!", Toast.LENGTH_SHORT).show();
                 setResult(RESULT_OK);
                 finish();
             });
         } else {
-            repository.insertRecipe(recipe, ingredientList, recipeId -> {
+            pantryService.insertRecipe(recipe, ingredientList, recipeId -> {
                 Toast.makeText(this, "Recipe '" + name + "' saved!", Toast.LENGTH_SHORT).show();
                 setResult(RESULT_OK);
                 finish();

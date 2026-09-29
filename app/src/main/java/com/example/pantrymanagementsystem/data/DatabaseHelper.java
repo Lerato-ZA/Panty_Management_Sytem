@@ -8,7 +8,6 @@ import com.example.pantrymanagementsystem.data.DatabaseContract.PantryItemEntry;
 import com.example.pantrymanagementsystem.data.DatabaseContract.RecipeEntry;
 import com.example.pantrymanagementsystem.data.DatabaseContract.RecipeIngredientEntry;
 
-// Handles creating and updating the local SQLite database file on device.
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "pantry_manager.db";
@@ -65,13 +64,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onConfigure(SQLiteDatabase db) {
         super.onConfigure(db);
-        // Turn on foreign key constraints so deleting a recipe automatically removes its ingredients
         db.setForeignKeyConstraintsEnabled(true);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        // Create parent tables first, then child tables with foreign keys
         db.execSQL(SQL_CREATE_RECIPES);
         db.execSQL(SQL_CREATE_PANTRY_ITEMS);
         db.execSQL(SQL_CREATE_RECIPE_INGREDIENTS);
@@ -79,7 +76,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // Re-create tables if database schema version changes
         db.execSQL(SQL_DELETE_RECIPE_INGREDIENTS);
         db.execSQL(SQL_DELETE_PANTRY_ITEMS);
         db.execSQL(SQL_DELETE_RECIPES);
