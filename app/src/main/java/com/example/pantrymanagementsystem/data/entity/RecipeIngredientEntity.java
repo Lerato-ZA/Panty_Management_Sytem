@@ -1,6 +1,6 @@
 package com.example.pantrymanagementsystem.data.entity;
 
-public class RecipeIngredient {
+public class RecipeIngredientEntity {
 
     private long id;
     private long recipeId;
@@ -8,8 +8,8 @@ public class RecipeIngredient {
     private double requiredQuantity;
     private String unit;
 
-    public RecipeIngredient(long recipeId, String ingredientName,
-                            double requiredQuantity, String unit) {
+    public RecipeIngredientEntity(long recipeId, String ingredientName,
+                                  double requiredQuantity, String unit) {
         this.recipeId = recipeId;
         this.ingredientName = ingredientName;
         this.requiredQuantity = requiredQuantity;

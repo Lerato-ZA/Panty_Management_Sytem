@@ -9,16 +9,14 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.pantrymanagementsystem.adapter.RecipeAdapter;
-import com.example.pantrymanagementsystem.data.entity.Recipe;
-import com.example.pantrymanagementsystem.data.entity.RecipeIngredient;
-import com.example.pantrymanagementsystem.repository.PantryRepository;
+import com.example.pantrymanagementsystem.data.entity.RecipeIngredientEntity;
+import com.example.pantrymanagementsystem.model.Recipe;
+import com.example.pantrymanagementsystem.service.PantryService;
+import com.example.pantrymanagementsystem.util.UiUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,10 +29,10 @@ public class RecipeListActivity extends AppCompatActivity implements RecipeAdapt
     private TextView tvEmptyRecipes;
     private View layoutEmptyRecipes;
     private RecipeAdapter adapter;
-    private PantryRepository repository;
+    private PantryService pantryService;
 
-    private List<Recipe> recipeList = new ArrayList<>();
-    private Map<Long, List<RecipeIngredient>> ingredientsMap = new HashMap<>();
+    private final List<Recipe> recipeList = new ArrayList<>();
+    private final Map<Long, List<RecipeIngredientEntity>> ingredientsMap = new HashMap<>();
     private ActivityResultLauncher<Intent> addEditRecipeLauncher;
 
     @Override
@@ -42,29 +40,11 @@ public class RecipeListActivity extends AppCompatActivity implements RecipeAdapt
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_list);
 
-        // Apply Window Insets
         View root = findViewById(R.id.recipeListRoot);
         View header = findViewById(R.id.layoutRecipeHeader);
-        if (root != null) {
-            ViewCompat.setOnApplyWindowInsetsListener(root, (v, windowInsets) -> {
-                Insets insets = windowInsets.getInsets(
-                        WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout()
-                );
-                if (header != null) {
-                    int extraTop = (int) (8 * getResources().getDisplayMetrics().density);
-                    header.setPadding(
-                            header.getPaddingLeft(),
-                            insets.top + extraTop,
-                            header.getPaddingRight(),
-                            header.getPaddingBottom()
-                    );
-                }
-                v.setPadding(insets.left, 0, insets.right, insets.bottom);
-                return windowInsets;
-            });
-        }
+        UiUtils.applyEdgeToEdge(root, header);
 
-        repository = PantryRepository.getInstance(this);
+        pantryService = PantryService.getInstance(this);
 
         rvRecipes = findViewById(R.id.rvRecipes);
         tvEmptyRecipes = findViewById(R.id.tvEmptyRecipes);
@@ -106,7 +86,7 @@ public class RecipeListActivity extends AppCompatActivity implements RecipeAdapt
     }
 
     private void loadRecipes() {
-        repository.getAllRecipes(recipes -> {
+        pantryService.getAllRecipes(recipes -> {
             recipeList.clear();
             ingredientsMap.clear();
 
@@ -118,7 +98,7 @@ public class RecipeListActivity extends AppCompatActivity implements RecipeAdapt
                 rvRecipes.setVisibility(View.VISIBLE);
 
                 for (Recipe recipe : recipes) {
-                    repository.getIngredientsForRecipe(recipe.getId(), ingredients -> {
+                    pantryService.getIngredientsForRecipe(recipe.getId(), ingredients -> {
                         if (ingredients != null) {
                             ingredientsMap.put(recipe.getId(), ingredients);
                             adapter.updateData(recipeList, ingredientsMap);
@@ -144,7 +124,7 @@ public class RecipeListActivity extends AppCompatActivity implements RecipeAdapt
 
     @Override
     public void onDeleteClicked(Recipe recipe) {
-        repository.deleteRecipe(recipe.getId(), success -> {
+        pantryService.deleteRecipe(recipe.getId(), success -> {
             Toast.makeText(this, "Recipe '" + recipe.getName() + "' deleted", Toast.LENGTH_SHORT).show();
             loadRecipes();
         });

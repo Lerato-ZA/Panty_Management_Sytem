@@ -7,12 +7,11 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.example.pantrymanagementsystem.data.DatabaseContract.PantryItemEntry;
 import com.example.pantrymanagementsystem.data.DatabaseHelper;
-import com.example.pantrymanagementsystem.data.entity.PantryItem;
+import com.example.pantrymanagementsystem.data.entity.PantryItemEntity;
 
 import java.util.ArrayList;
 import java.util.List;
 
-// SQLite Operations
 public class PantryItemDao {
 
     private final DatabaseHelper dbHelper;
@@ -21,14 +20,12 @@ public class PantryItemDao {
         this.dbHelper = DatabaseHelper.getInstance(context);
     }
 
-    // Create
-    public long insert(PantryItem item) {
+    public long insert(PantryItemEntity item) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         return db.insert(PantryItemEntry.TABLE_NAME, null, toContentValues(item));
     }
 
-    // Read
-    public PantryItem getById(long id) {
+    public PantryItemEntity getById(long id) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String selection = PantryItemEntry._ID + " = ?";
         String[] args = { String.valueOf(id) };
@@ -38,8 +35,8 @@ public class PantryItemDao {
         }
     }
 
-    public List<PantryItem> getAll() {
-        List<PantryItem> items = new ArrayList<>();
+    public List<PantryItemEntity> getAll() {
+        List<PantryItemEntity> items = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String orderBy = PantryItemEntry.COLUMN_NAME + " ASC";
         try (Cursor cursor = db.query(PantryItemEntry.TABLE_NAME, null,
@@ -51,8 +48,8 @@ public class PantryItemDao {
         return items;
     }
 
-    public List<PantryItem> search(String query) {
-        List<PantryItem> items = new ArrayList<>();
+    public List<PantryItemEntity> search(String query) {
+        List<PantryItemEntity> items = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String selection = PantryItemEntry.COLUMN_NAME + " LIKE ?";
         String[] args = { "%" + query + "%" };
@@ -66,31 +63,13 @@ public class PantryItemDao {
         return items;
     }
 
-    public List<PantryItem> getExpiringBefore(long thresholdEpochMillis) {
-        List<PantryItem> items = new ArrayList<>();
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        String selection = PantryItemEntry.COLUMN_EXPIRY_DATE + " IS NOT NULL AND " +
-                PantryItemEntry.COLUMN_EXPIRY_DATE + " <= ?";
-        String[] args = { String.valueOf(thresholdEpochMillis) };
-        String orderBy = PantryItemEntry.COLUMN_EXPIRY_DATE + " ASC";
-        try (Cursor cursor = db.query(PantryItemEntry.TABLE_NAME, null,
-                selection, args, null, null, orderBy)) {
-            while (cursor.moveToNext()) {
-                items.add(fromCursor(cursor));
-            }
-        }
-        return items;
-    }
-
-    //  Update
-    public int update(PantryItem item) {
+    public int update(PantryItemEntity item) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         String selection = PantryItemEntry._ID + " = ?";
         String[] args = { String.valueOf(item.getId()) };
         return db.update(PantryItemEntry.TABLE_NAME, toContentValues(item), selection, args);
     }
 
-    //  Delete
     public int delete(long id) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         String selection = PantryItemEntry._ID + " = ?";
@@ -98,8 +77,7 @@ public class PantryItemDao {
         return db.delete(PantryItemEntry.TABLE_NAME, selection, args);
     }
 
-    //  Mapping helpers
-    private ContentValues toContentValues(PantryItem item) {
+    private ContentValues toContentValues(PantryItemEntity item) {
         ContentValues values = new ContentValues();
         values.put(PantryItemEntry.COLUMN_NAME, item.getName());
         values.put(PantryItemEntry.COLUMN_QUANTITY, item.getQuantity());
@@ -114,7 +92,7 @@ public class PantryItemDao {
         return values;
     }
 
-    private PantryItem fromCursor(Cursor cursor) {
+    private PantryItemEntity fromCursor(Cursor cursor) {
         long id = cursor.getLong(cursor.getColumnIndexOrThrow(PantryItemEntry._ID));
         String name = cursor.getString(cursor.getColumnIndexOrThrow(PantryItemEntry.COLUMN_NAME));
         double quantity = cursor.getDouble(cursor.getColumnIndexOrThrow(PantryItemEntry.COLUMN_QUANTITY));
@@ -126,7 +104,7 @@ public class PantryItemDao {
 
         long dateAdded = cursor.getLong(cursor.getColumnIndexOrThrow(PantryItemEntry.COLUMN_DATE_ADDED));
 
-        PantryItem item = new PantryItem(name, quantity, unit, category, expiryDate, dateAdded);
+        PantryItemEntity item = new PantryItemEntity(name, quantity, unit, category, expiryDate, dateAdded);
         item.setId(id);
         return item;
     }
