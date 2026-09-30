@@ -70,7 +70,12 @@ public class AddRecipeActivity extends AppCompatActivity {
                         if (ingredients != null && !ingredients.isEmpty()) {
                             StringBuilder sb = new StringBuilder();
                             for (RecipeIngredientEntity ing : ingredients) {
-                                sb.append(ing.getIngredientName()).append("\n");
+                                int qtyInt = (int) ing.getRequiredQuantity();
+                                if (qtyInt > 1 || ing.getRequiredQuantity() != 1.0) {
+                                    sb.append(qtyInt).append(" ").append(ing.getIngredientName()).append("\n");
+                                } else {
+                                    sb.append(ing.getIngredientName()).append("\n");
+                                }
                             }
                             etIngredients.setText(sb.toString().trim());
                         }
@@ -125,9 +130,9 @@ public class AddRecipeActivity extends AppCompatActivity {
         List<RecipeIngredientEntity> ingredientList = new ArrayList<>();
         String[] lines = ingredientsRaw.split("\n");
         for (String line : lines) {
-            String trimmed = line.trim();
-            if (!trimmed.isEmpty()) {
-                ingredientList.add(new RecipeIngredientEntity(editingRecipeId > 0 ? editingRecipeId : 0, trimmed, 1.0, "unit"));
+            RecipeIngredientEntity ing = parseIngredientLine(editingRecipeId > 0 ? editingRecipeId : 0, line);
+            if (ing != null) {
+                ingredientList.add(ing);
             }
         }
 
@@ -144,5 +149,32 @@ public class AddRecipeActivity extends AppCompatActivity {
                 finish();
             });
         }
+    }
+
+    private RecipeIngredientEntity parseIngredientLine(long recipeId, String line) {
+        if (line == null) return null;
+        String trimmed = line.trim();
+        if (trimmed.isEmpty()) return null;
+
+        double qty = 1.0;
+        String unit = "pcs";
+        String name = trimmed;
+
+        String[] parts = trimmed.split("\\s+", 2);
+        if (parts.length > 0) {
+            try {
+                qty = Double.parseDouble(parts[0]);
+                if (parts.length > 1) {
+                    name = parts[1].trim();
+                }
+            } catch (NumberFormatException ignored) {
+            }
+        }
+
+        if (name.isEmpty()) {
+            name = trimmed;
+        }
+
+        return new RecipeIngredientEntity(recipeId, name, qty, unit);
     }
 }

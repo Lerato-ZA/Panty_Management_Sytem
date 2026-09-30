@@ -49,10 +49,45 @@
                 android:id="@+id/tvHeaderSubtitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Recipes you can make right now based on your pantry items:"
+                android:text="Discover recipes based on your pantry stock:"
                 android:textColor="@color/text_on_dark_secondary"
                 android:textSize="12sp" />
         </LinearLayout>
+    </LinearLayout>
+
+    <!-- Filter Toggle Tabs -->
+    <LinearLayout
+        android:id="@+id/layoutFilterTabs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="4dp">
+
+        <Button
+            android:id="@+id/btnTabReady"
+            style="@style/Widget.Material3.Button"
+            android:layout_width="0dp"
+            android:layout_height="42dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="6dp"
+            android:text="Ready to Cook"
+            android:textAllCaps="false"
+            android:textSize="13sp"
+            app:cornerRadius="20dp" />
+
+        <Button
+            android:id="@+id/btnTabAlmost"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="42dp"
+            android:layout_weight="1"
+            android:layout_marginStart="6dp"
+            android:text="Almost (1-2 Short)"
+            android:textAllCaps="false"
+            android:textSize="13sp"
+            app:cornerRadius="20dp" />
     </LinearLayout>
 
     <!-- Empty Suggestions State -->
