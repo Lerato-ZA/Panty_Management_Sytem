@@ -11,8 +11,10 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.pantrymanagementsystem.R;
+import com.example.pantrymanagementsystem.data.entity.PantryItemEntity;
 import com.example.pantrymanagementsystem.data.entity.RecipeIngredientEntity;
 import com.example.pantrymanagementsystem.model.Recipe;
+import com.example.pantrymanagementsystem.util.IngredientMatcher;
 
 import java.util.List;
 import java.util.Map;
@@ -26,6 +28,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
 
     private List<Recipe> recipes;
     private Map<Long, List<RecipeIngredientEntity>> ingredientsMap;
+    private List<PantryItemEntity> pantryItems;
     private final OnRecipeActionListener listener;
 
     public RecipeAdapter(List<Recipe> recipes, Map<Long, List<RecipeIngredientEntity>> ingredientsMap) {
@@ -40,8 +43,14 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
 
     @SuppressLint("NotifyDataSetChanged")
     public void updateData(List<Recipe> newRecipes, Map<Long, List<RecipeIngredientEntity>> newMap) {
+        updateData(newRecipes, newMap, null);
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    public void updateData(List<Recipe> newRecipes, Map<Long, List<RecipeIngredientEntity>> newMap, List<PantryItemEntity> pantryItems) {
         this.recipes = newRecipes;
         this.ingredientsMap = newMap;
+        this.pantryItems = pantryItems;
         notifyDataSetChanged();
     }
 
@@ -63,11 +72,28 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
 
         StringBuilder ingText = new StringBuilder();
         List<RecipeIngredientEntity> ingredients = ingredientsMap != null ? ingredientsMap.get(recipe.getId()) : null;
+
         if (ingredients != null && !ingredients.isEmpty()) {
             for (RecipeIngredientEntity ing : ingredients) {
-                ingText.append("\u2022 ").append(ing.getIngredientName())
-                        .append(" (").append(ing.getRequiredQuantity() % 1 == 0 ? (int) ing.getRequiredQuantity() : ing.getRequiredQuantity())
-                        .append(" ").append(ing.getUnit()).append(")\n");
+                if (pantryItems != null) {
+                    PantryItemEntity matchedPantry = IngredientMatcher.findPantryMatch(pantryItems, ing);
+                    if (matchedPantry == null) {
+                        ingText.append("❌ ").append(ing.getIngredientName()).append(" — Missing\n");
+                    } else if (!IngredientMatcher.isQuantitySatisfied(matchedPantry, ing)) {
+                        ingText.append("⚠️ ").append(ing.getIngredientName())
+                               .append(" — Short (have ").append(formatQty(matchedPantry.getQuantity()))
+                               .append(", need ").append(formatQty(ing.getRequiredQuantity()))
+                               .append(" ").append(ing.getUnit()).append(")\n");
+                    } else {
+                        ingText.append("✓ ").append(ing.getIngredientName())
+                               .append(" (").append(formatQty(ing.getRequiredQuantity()))
+                               .append(" ").append(ing.getUnit()).append(")\n");
+                    }
+                } else {
+                    ingText.append("• ").append(ing.getIngredientName())
+                           .append(" (").append(formatQty(ing.getRequiredQuantity()))
+                           .append(" ").append(ing.getUnit()).append(")\n");
+                }
             }
         } else {
             ingText.append("No specific ingredients listed");
@@ -85,6 +111,10 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
             holder.btnEditRecipe.setVisibility(View.GONE);
             holder.btnDeleteRecipe.setVisibility(View.GONE);
         }
+    }
+
+    private String formatQty(double qty) {
+        return (qty % 1 == 0) ? String.valueOf((int) qty) : String.valueOf(qty);
     }
 
     @Override

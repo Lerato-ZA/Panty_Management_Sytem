@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.pantrymanagementsystem.adapter.RecipeAdapter;
+import com.example.pantrymanagementsystem.data.entity.PantryItemEntity;
 import com.example.pantrymanagementsystem.data.entity.RecipeIngredientEntity;
 import com.example.pantrymanagementsystem.model.Recipe;
 import com.example.pantrymanagementsystem.service.PantryService;
@@ -33,6 +34,7 @@ public class MealSuggestionsActivity extends AppCompatActivity {
     private final List<Recipe> almostRecipes = new ArrayList<>();
     private final List<Recipe> displayedRecipes = new ArrayList<>();
     private final Map<Long, List<RecipeIngredientEntity>> ingredientsMap = new HashMap<>();
+    private final List<PantryItemEntity> pantryItems = new ArrayList<>();
 
     private boolean isShowingReady = true;
 
@@ -82,14 +84,16 @@ public class MealSuggestionsActivity extends AppCompatActivity {
     }
 
     private void loadSuggestions() {
-        pantryService.getSuggestedRecipes((ready, almost, map) -> {
+        pantryService.getSuggestedRecipes((ready, almost, map, pantry) -> {
             readyRecipes.clear();
             almostRecipes.clear();
             ingredientsMap.clear();
+            pantryItems.clear();
 
             if (ready != null) readyRecipes.addAll(ready);
             if (almost != null) almostRecipes.addAll(almost);
             if (map != null) ingredientsMap.putAll(map);
+            if (pantry != null) pantryItems.addAll(pantry);
 
             if (btnTabReady != null) {
                 btnTabReady.setText("Ready (" + readyRecipes.size() + ")");
@@ -132,6 +136,6 @@ public class MealSuggestionsActivity extends AppCompatActivity {
             rvSuggestedRecipes.setVisibility(View.GONE);
         }
 
-        adapter.updateData(displayedRecipes, ingredientsMap);
+        adapter.updateData(displayedRecipes, ingredientsMap, pantryItems);
     }
 }

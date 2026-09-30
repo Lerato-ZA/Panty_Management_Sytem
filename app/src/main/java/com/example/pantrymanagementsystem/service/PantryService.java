@@ -12,6 +12,7 @@ import com.example.pantrymanagementsystem.data.entity.RecipeEntity;
 import com.example.pantrymanagementsystem.data.entity.RecipeIngredientEntity;
 import com.example.pantrymanagementsystem.model.PantryItem;
 import com.example.pantrymanagementsystem.model.Recipe;
+import com.example.pantrymanagementsystem.util.IngredientMatcher;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ public class PantryService {
     }
 
     public interface SuggestionCallback {
-        void onComplete(List<Recipe> readyRecipes, List<Recipe> almostRecipes, Map<Long, List<RecipeIngredientEntity>> ingredientsMap);
+        void onComplete(List<Recipe> readyRecipes, List<Recipe> almostRecipes, Map<Long, List<RecipeIngredientEntity>> ingredientsMap, List<PantryItemEntity> pantryItems);
     }
 
     private final PantryItemDao pantryItemDao;
@@ -185,34 +186,9 @@ public class PantryService {
                 int shortCount = 0;
 
                 for (RecipeIngredientEntity req : ingredients) {
-                    PantryItemEntity matchedItem = null;
-
-                    // First pass: search in-stock matching item in pantry (quantity > 0)
-                    for (PantryItemEntity item : pantry) {
-                        if (item.getQuantity() > 0 && isIngredientMatch(item.getName(), req.getIngredientName())) {
-                            matchedItem = item;
-                            break;
-                        }
-                    }
-
-                    // Second pass: if no in-stock item matched, search out-of-stock items
-                    if (matchedItem == null) {
-                        for (PantryItemEntity item : pantry) {
-                            if (isIngredientMatch(item.getName(), req.getIngredientName())) {
-                                matchedItem = item;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (matchedItem == null) {
+                    PantryItemEntity matchedItem = IngredientMatcher.findPantryMatch(pantry, req);
+                    if (matchedItem == null || !IngredientMatcher.isQuantitySatisfied(matchedItem, req)) {
                         shortCount++;
-                    } else {
-                        double availableQty = matchedItem.getQuantity();
-                        double requiredQty = req.getRequiredQuantity();
-                        if (availableQty < requiredQty) {
-                            shortCount++;
-                        }
                     }
                 }
 
@@ -225,61 +201,8 @@ public class PantryService {
                 }
             }
 
-            mainHandler.post(() -> callback.onComplete(readyRecipes, almostRecipes, resultMap));
+            mainHandler.post(() -> callback.onComplete(readyRecipes, almostRecipes, resultMap, pantry));
         });
-    }
-
-    private boolean isIngredientMatch(String pantryName, String requiredName) {
-        if (pantryName == null || requiredName == null) return false;
-
-        String p = pantryName.replaceAll("[^a-zA-Z0-9\\s]", " ").trim().toLowerCase();
-        String r = requiredName.replaceAll("[^a-zA-Z0-9\\s]", " ").trim().toLowerCase();
-
-        if (p.isEmpty() || r.isEmpty()) return false;
-        if (p.equals(r) || stem(p).equals(stem(r))) return true;
-        if (p.contains(r) || r.contains(p)) return true;
-
-        String[] pWords = filterStopWords(p.split("\\s+"));
-        String[] rWords = filterStopWords(r.split("\\s+"));
-
-        if (pWords.length == 0 || rWords.length == 0) return false;
-
-        for (String rWord : rWords) {
-            String rStem = stem(rWord);
-            for (String pWord : pWords) {
-                String pStem = stem(pWord);
-                if (pStem.equals(rStem) || pWord.contains(rWord) || rWord.contains(pWord)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    private String stem(String word) {
-        if (word == null) return "";
-        String w = word.toLowerCase();
-        if (w.endsWith("es") && w.length() > 4) return w.substring(0, w.length() - 2);
-        if (w.endsWith("s") && w.length() > 3) return w.substring(0, w.length() - 1);
-        return w;
-    }
-
-    private String[] filterStopWords(String[] words) {
-        List<String> list = new ArrayList<>();
-        for (String w : words) {
-            String t = w.trim().toLowerCase();
-            if (t.length() <= 2) continue;
-            if (t.equals("fresh") || t.equals("organic") || t.equals("chopped") ||
-                t.equals("sliced") || t.equals("diced") || t.equals("ground") ||
-                t.equals("canned") || t.equals("large") || t.equals("small") ||
-                t.equals("cup") || t.equals("cups") || t.equals("unit") || t.equals("piece") ||
-                t.equals("gram") || t.equals("grams") || t.equals("tbsp") || t.equals("tsp")) {
-                continue;
-            }
-            list.add(t);
-        }
-        return list.toArray(new String[0]);
     }
 
     // Entity <-> GUI Mappers
