@@ -33,7 +33,54 @@
                 android:textSize="22sp"
                 android:textStyle="bold" />
 
-            <!-- Row 2: Quick Stats (Pantry Items & Saved Recipes) -->
+            <!-- Row 2: Action Buttons (Equal width, 44dp height, no notch overlap) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="horizontal">
+
+                <!-- Recipes Action Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnRecipes"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:text="Recipes"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/on_primary"
+                    app:backgroundTint="#2EFFFFFF"
+                    app:strokeColor="#50FFFFFF"
+                    app:strokeWidth="1dp"
+                    app:cornerRadius="12dp"
+                    app:icon="@drawable/ic_recipes"
+                    app:iconSize="18dp"
+                    app:iconTint="#FFFFFF"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp" />
+
+                <!-- Suggest Meal Action Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSuggestMeal"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="10dp"
+                    android:text="Suggest Meal"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="#3D2100"
+                    app:backgroundTint="#FDF2E9"
+                    app:cornerRadius="12dp"
+                    app:icon="@drawable/ic_sparkle"
+                    app:iconSize="18dp"
+                    app:iconTint="@color/secondary"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp" />
+            </LinearLayout>
+
+            <!-- Row 3: Quick Stats (Pantry Items & Saved Recipes) -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -125,53 +172,6 @@
                     </LinearLayout>
                 </LinearLayout>
 
-            </LinearLayout>
-
-            <!-- Row 3: Action Buttons (Equal width, 44dp height, no notch overlap) -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:orientation="horizontal">
-
-                <!-- Recipes Action Button -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnRecipes"
-                    android:layout_width="0dp"
-                    android:layout_height="44dp"
-                    android:layout_weight="1"
-                    android:text="Recipes"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/on_primary"
-                    app:backgroundTint="#2EFFFFFF"
-                    app:strokeColor="#50FFFFFF"
-                    app:strokeWidth="1dp"
-                    app:cornerRadius="12dp"
-                    app:icon="@drawable/ic_recipes"
-                    app:iconSize="18dp"
-                    app:iconTint="#FFFFFF"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp" />
-
-                <!-- Suggest Meal Action Button -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnSuggestMeal"
-                    android:layout_width="0dp"
-                    android:layout_height="44dp"
-                    android:layout_weight="1"
-                    android:layout_marginStart="10dp"
-                    android:text="Suggest Meal"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    android:textColor="#3D2100"
-                    app:backgroundTint="#FDF2E9"
-                    app:cornerRadius="12dp"
-                    app:icon="@drawable/ic_sparkle"
-                    app:iconSize="18dp"
-                    app:iconTint="@color/secondary"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp" />
             </LinearLayout>
 
         </LinearLayout>
