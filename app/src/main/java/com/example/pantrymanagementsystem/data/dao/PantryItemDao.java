@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.example.pantrymanagementsystem.data.DatabaseContract.PantryItemEntry;
 import com.example.pantrymanagementsystem.data.DatabaseHelper;
-import com.example.pantrymanagementsystem.data.entity.PantryItem;
+import com.example.pantrymanagementsystem.data.entity.PantryItemEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,13 +22,13 @@ public class PantryItemDao {
     }
 
     // Create
-    public long insert(PantryItem item) {
+    public long insert(PantryItemEntity item) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         return db.insert(PantryItemEntry.TABLE_NAME, null, toContentValues(item));
     }
 
     // Read from the db
-    public PantryItem getById(long id) {
+    public PantryItemEntity getById(long id) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String selection = PantryItemEntry._ID + " = ?";
         String[] args = { String.valueOf(id) };
@@ -38,8 +38,8 @@ public class PantryItemDao {
         }
     }
 
-    public List<PantryItem> getAll() {
-        List<PantryItem> items = new ArrayList<>();
+    public List<PantryItemEntity> getAll() {
+        List<PantryItemEntity> items = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String orderBy = PantryItemEntry.COLUMN_NAME + " ASC";
         try (Cursor cursor = db.query(PantryItemEntry.TABLE_NAME, null,
@@ -51,8 +51,8 @@ public class PantryItemDao {
         return items;
     }
 
-    public List<PantryItem> search(String query) {
-        List<PantryItem> items = new ArrayList<>();
+    public List<PantryItemEntity> search(String query) {
+        List<PantryItemEntity> items = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String selection = PantryItemEntry.COLUMN_NAME + " LIKE ?";
         String[] args = { "%" + query + "%" };
@@ -67,7 +67,7 @@ public class PantryItemDao {
     }
 
     // Update
-    public int update(PantryItem item) {
+    public int update(PantryItemEntity item) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         String selection = PantryItemEntry._ID + " = ?";
         String[] args = { String.valueOf(item.getId()) };
@@ -83,7 +83,7 @@ public class PantryItemDao {
     }
 
     // Mapping helpers
-    private ContentValues toContentValues(PantryItem item) {
+    private ContentValues toContentValues(PantryItemEntity item) {
         ContentValues values = new ContentValues();
         values.put(PantryItemEntry.COLUMN_NAME, item.getName());
         values.put(PantryItemEntry.COLUMN_QUANTITY, item.getQuantity());
@@ -98,7 +98,7 @@ public class PantryItemDao {
         return values;
     }
 
-    private PantryItem fromCursor(Cursor cursor) {
+    private PantryItemEntity fromCursor(Cursor cursor) {
         long id = cursor.getLong(cursor.getColumnIndexOrThrow(PantryItemEntry._ID));
         String name = cursor.getString(cursor.getColumnIndexOrThrow(PantryItemEntry.COLUMN_NAME));
         double quantity = cursor.getDouble(cursor.getColumnIndexOrThrow(PantryItemEntry.COLUMN_QUANTITY));
@@ -110,7 +110,7 @@ public class PantryItemDao {
 
         long dateAdded = cursor.getLong(cursor.getColumnIndexOrThrow(PantryItemEntry.COLUMN_DATE_ADDED));
 
-        PantryItem item = new PantryItem(name, quantity, unit, category, expiryDate, dateAdded);
+        PantryItemEntity item = new PantryItemEntity(name, quantity, unit, category, expiryDate, dateAdded);
         item.setId(id);
         return item;
     }

@@ -1,8 +1,7 @@
 package com.example.pantrymanagementsystem.data.entity;
 
-
-// Item class
-public class  PantryItem {
+// Item entity class for database persistence
+public class PantryItemEntity {
 
     private long id;
     private String name;
@@ -12,8 +11,8 @@ public class  PantryItem {
     private Long expiryDate;
     private long dateAdded;
 
-    public PantryItem(String name, double quantity, String unit,
-                      String category, Long expiryDate, long dateAdded) {
+    public PantryItemEntity(String name, double quantity, String unit,
+                            String category, Long expiryDate, long dateAdded) {
         this.name = name;
         this.quantity = quantity;
         this.unit = unit;

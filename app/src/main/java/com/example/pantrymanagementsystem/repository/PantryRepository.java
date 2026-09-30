@@ -7,9 +7,9 @@ import android.os.Looper;
 import com.example.pantrymanagementsystem.data.dao.PantryItemDao;
 import com.example.pantrymanagementsystem.data.dao.RecipeDao;
 import com.example.pantrymanagementsystem.data.dao.RecipeIngredientDao;
-import com.example.pantrymanagementsystem.data.entity.PantryItem;
-import com.example.pantrymanagementsystem.data.entity.Recipe;
-import com.example.pantrymanagementsystem.data.entity.RecipeIngredient;
+import com.example.pantrymanagementsystem.data.entity.PantryItemEntity;
+import com.example.pantrymanagementsystem.data.entity.RecipeEntity;
+import com.example.pantrymanagementsystem.data.entity.RecipeIngredientEntity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,7 +26,7 @@ public class PantryRepository {
     }
 
     public interface SuggestionCallback {
-        void onComplete(List<Recipe> recipes, Map<Long, List<RecipeIngredient>> ingredientsMap);
+        void onComplete(List<RecipeEntity> recipes, Map<Long, List<RecipeIngredientEntity>> ingredientsMap);
     }
 
     private final PantryItemDao pantryItemDao;
@@ -57,28 +57,28 @@ public class PantryRepository {
 
     // Pantry Item Operations
 
-    public void getAllPantryItems(Callback<List<PantryItem>> callback) {
+    public void getAllPantryItems(Callback<List<PantryItemEntity>> callback) {
         executor.execute(() -> {
-            List<PantryItem> items = pantryItemDao.getAll();
+            List<PantryItemEntity> items = pantryItemDao.getAll();
             mainHandler.post(() -> callback.onComplete(items));
         });
     }
 
-    public void getPantryItemById(long id, Callback<PantryItem> callback) {
+    public void getPantryItemById(long id, Callback<PantryItemEntity> callback) {
         executor.execute(() -> {
-            PantryItem item = pantryItemDao.getById(id);
+            PantryItemEntity item = pantryItemDao.getById(id);
             mainHandler.post(() -> callback.onComplete(item));
         });
     }
 
-    public void insertPantryItem(PantryItem item, Callback<Long> callback) {
+    public void insertPantryItem(PantryItemEntity item, Callback<Long> callback) {
         executor.execute(() -> {
             long newId = pantryItemDao.insert(item);
             mainHandler.post(() -> callback.onComplete(newId));
         });
     }
 
-    public void updatePantryItem(PantryItem item, Callback<Boolean> callback) {
+    public void updatePantryItem(PantryItemEntity item, Callback<Boolean> callback) {
         executor.execute(() -> {
             int rows = pantryItemDao.update(item);
             mainHandler.post(() -> callback.onComplete(rows > 0));
@@ -92,36 +92,34 @@ public class PantryRepository {
         });
     }
 
-
-
     // Recipe Operations
 
-    public void getAllRecipes(Callback<List<Recipe>> callback) {
+    public void getAllRecipes(Callback<List<RecipeEntity>> callback) {
         executor.execute(() -> {
-            List<Recipe> recipes = recipeDao.getAll();
+            List<RecipeEntity> recipes = recipeDao.getAll();
             mainHandler.post(() -> callback.onComplete(recipes));
         });
     }
 
-    public void getRecipeById(long recipeId, Callback<Recipe> callback) {
+    public void getRecipeById(long recipeId, Callback<RecipeEntity> callback) {
         executor.execute(() -> {
-            Recipe recipe = recipeDao.getById(recipeId);
+            RecipeEntity recipe = recipeDao.getById(recipeId);
             mainHandler.post(() -> callback.onComplete(recipe));
         });
     }
 
-    public void getIngredientsForRecipe(long recipeId, Callback<List<RecipeIngredient>> callback) {
+    public void getIngredientsForRecipe(long recipeId, Callback<List<RecipeIngredientEntity>> callback) {
         executor.execute(() -> {
-            List<RecipeIngredient> ingredients = recipeIngredientDao.getForRecipe(recipeId);
+            List<RecipeIngredientEntity> ingredients = recipeIngredientDao.getForRecipe(recipeId);
             mainHandler.post(() -> callback.onComplete(ingredients));
         });
     }
 
-    public void insertRecipe(Recipe recipe, List<RecipeIngredient> ingredients, Callback<Long> callback) {
+    public void insertRecipe(RecipeEntity recipe, List<RecipeIngredientEntity> ingredients, Callback<Long> callback) {
         executor.execute(() -> {
             long recipeId = recipeDao.insert(recipe);
             if (recipeId > 0 && ingredients != null) {
-                for (RecipeIngredient ing : ingredients) {
+                for (RecipeIngredientEntity ing : ingredients) {
                     ing.setRecipeId(recipeId);
                 }
                 recipeIngredientDao.insertAll(ingredients);
@@ -130,12 +128,12 @@ public class PantryRepository {
         });
     }
 
-    public void updateRecipe(Recipe recipe, List<RecipeIngredient> ingredients, Callback<Boolean> callback) {
+    public void updateRecipe(RecipeEntity recipe, List<RecipeIngredientEntity> ingredients, Callback<Boolean> callback) {
         executor.execute(() -> {
             int rows = recipeDao.update(recipe);
             recipeIngredientDao.deleteForRecipe(recipe.getId());
             if (ingredients != null) {
-                for (RecipeIngredient ing : ingredients) {
+                for (RecipeIngredientEntity ing : ingredients) {
                     ing.setRecipeId(recipe.getId());
                 }
                 recipeIngredientDao.insertAll(ingredients);
@@ -155,23 +153,23 @@ public class PantryRepository {
 
     public void getSuggestedRecipes(SuggestionCallback callback) {
         executor.execute(() -> {
-            List<PantryItem> pantry = pantryItemDao.getAll();
-            List<Recipe> allRecipes = recipeDao.getAll();
-            List<Recipe> suggestedRecipes = new ArrayList<>();
-            Map<Long, List<RecipeIngredient>> resultMap = new HashMap<>();
+            List<PantryItemEntity> pantry = pantryItemDao.getAll();
+            List<RecipeEntity> allRecipes = recipeDao.getAll();
+            List<RecipeEntity> suggestedRecipes = new ArrayList<>();
+            Map<Long, List<RecipeIngredientEntity>> resultMap = new HashMap<>();
 
-            for (Recipe recipe : allRecipes) {
-                List<RecipeIngredient> ingredients = recipeIngredientDao.getForRecipe(recipe.getId());
+            for (RecipeEntity recipe : allRecipes) {
+                List<RecipeIngredientEntity> ingredients = recipeIngredientDao.getForRecipe(recipe.getId());
                 if (ingredients.isEmpty()) {
                     continue;
                 }
 
                 boolean canMake = true;
 
-                for (RecipeIngredient req : ingredients) {
+                for (RecipeIngredientEntity req : ingredients) {
                     boolean ingredientMatch = false;
 
-                    for (PantryItem item : pantry) {
+                    for (PantryItemEntity item : pantry) {
                         if (item.getQuantity() > 0 && isIngredientMatch(item.getName(), req.getIngredientName())) {
                             ingredientMatch = true;
                             break;
@@ -197,7 +195,6 @@ public class PantryRepository {
     private boolean isIngredientMatch(String pantryItemName, String requiredName) {
         if (pantryItemName == null || requiredName == null) return false;
 
-        // Clean punctuation and normalize
         String p = pantryItemName.replaceAll("[^a-zA-Z0-9\\s]", " ").replaceAll("\\s+", " ").trim().toLowerCase();
         String r = requiredName.replaceAll("[^a-zA-Z0-9\\s]", " ").replaceAll("\\s+", " ").trim().toLowerCase();
 
@@ -211,7 +208,7 @@ public class PantryRepository {
         String[] rWords = r.split(" ");
 
         for (String rWord : rWords) {
-            if (rWord.length() <= 2) continue; // skip short words like "of", "in"
+            if (rWord.length() <= 2) continue;
             for (String pWord : pWords) {
                 if (pWord.equals(rWord) || pWord.contains(rWord) || rWord.contains(pWord)) {
                     return true;
