@@ -84,6 +84,8 @@
                             android:id="@+id/etItemName"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:textColor="@color/text_primary"
+                            android:textColorHint="@color/text_tertiary"
                             android:inputType="textCapWords" />
                     </com.google.android.material.textfield.TextInputLayout>
 
@@ -103,6 +105,8 @@
                             android:id="@+id/etSize"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:textColor="@color/text_primary"
+                            android:textColorHint="@color/text_tertiary"
                             android:inputType="text" />
                     </com.google.android.material.textfield.TextInputLayout>
 
@@ -120,6 +124,8 @@
                             android:id="@+id/etQuantity"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:textColor="@color/text_primary"
+                            android:textColorHint="@color/text_tertiary"
                             android:inputType="number"
                             android:text="1" />
                     </com.google.android.material.textfield.TextInputLayout>
@@ -158,6 +164,8 @@
                             android:id="@+id/etExpiryDate"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:textColor="@color/text_primary"
+                            android:textColorHint="@color/text_tertiary"
                             android:focusable="false"
                             android:clickable="true" />
                     </com.google.android.material.textfield.TextInputLayout>

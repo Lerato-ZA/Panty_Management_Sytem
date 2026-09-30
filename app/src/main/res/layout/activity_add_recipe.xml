@@ -84,6 +84,8 @@
                             android:id="@+id/etRecipeName"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:textColor="@color/text_primary"
+                            android:textColorHint="@color/text_tertiary"
                             android:inputType="textCapWords" />
                     </com.google.android.material.textfield.TextInputLayout>
 
@@ -101,6 +103,8 @@
                             android:id="@+id/etIngredients"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:textColor="@color/text_primary"
+                            android:textColorHint="@color/text_tertiary"
                             android:inputType="textMultiLine"
                             android:minLines="3"
                             android:gravity="top" />
@@ -120,6 +124,8 @@
                             android:id="@+id/etInstructions"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:textColor="@color/text_primary"
+                            android:textColorHint="@color/text_tertiary"
                             android:inputType="textMultiLine"
                             android:minLines="3"
                             android:gravity="top" />
@@ -141,6 +147,8 @@
                             android:id="@+id/etCookTime"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:textColor="@color/text_primary"
+                            android:textColorHint="@color/text_tertiary"
                             android:inputType="number" />
                     </com.google.android.material.textfield.TextInputLayout>
 
@@ -160,6 +168,8 @@
                             android:id="@+id/etServings"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:textColor="@color/text_primary"
+                            android:textColorHint="@color/text_tertiary"
                             android:inputType="number" />
                     </com.google.android.material.textfield.TextInputLayout>
 

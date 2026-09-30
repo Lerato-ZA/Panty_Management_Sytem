@@ -72,6 +72,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(SQL_CREATE_RECIPES);
         db.execSQL(SQL_CREATE_PANTRY_ITEMS);
         db.execSQL(SQL_CREATE_RECIPE_INGREDIENTS);
+
+        // Seed initial recipes and matching pantry items into database on first app installation
+        DatabaseSeeder.seedRecipes(db);
+        DatabaseSeeder.seedPantryItems(db);
     }
 
     @Override
